@@ -1,0 +1,116 @@
+<!doctype html><html lang="zh-CN"><head>
+<meta charset="utf-8"/><meta name="robots" content="noindex,nofollow"/><meta name="referrer" content="strict-origin-when-cross-origin"/><meta name="description" content="University of Windsor classroom schedule lookup, Erie Hall and Lambton Tower CS labs, Fall 2026."/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="color-scheme" content="light"/><title>Windsor Rooms · 教室空档和电脑机房</title>
+<link rel="stylesheet" href="./styles.css"/>
+</head><body>
+<div class="layout">
+<aside class="sidebar">
+ <div class="brand"><div class="brand-icon">W</div><div><div class="brand-name">Windsor Rooms</div><div class="brand-small">CAMPUS SPACE INTELLIGENCE</div></div></div>
+ <nav><div class="nav-title">导航 · Explore</div>
+ <button class="nav-link active" data-scroll="focus"><span class="mark">▦</span>电脑机房</button>
+ <button class="nav-link" data-scroll="weekly"><span class="mark">▤</span>每周课表</button>
+ <button class="nav-link" data-scroll="inventory"><span class="mark">▣</span>设备资料</button>
+ <button class="nav-link" data-scroll="all"><span class="mark">⌕</span>全校教室</button>
+ </nav>
+ <div class="nav-note"><div style="font-size:10px;letter-spacing:.1em">DATA COVERAGE</div><strong>2026 · Fall</strong><div>课程排课与期末考试快照已合并；重点关注 Lambton Tower、Erie Hall。</div><div style="margin-top:11px;color:#8fc6c1">● 离线可查 · 不需要再次登录</div></div>
+</aside>
+<main class="workspace">
+ <div class="topline"><span class="eyebrow">CAMPUS / CLASSROOM FINDER</span><span class="version">v3.0 · offline snapshot</span></div>
+ <div class="hero"><div><div class="eyebrow" style="color:#237a76">MAKE TIME FOR WHAT MATTERS</div><h1>看看哪间电脑机房可能空着。</h1><p class="subtext">先看 Lambton Tower 和 Erie Hall 的机房，再按日期、教室与星期查课。把课程、任课教师、硬件配置和待核实信息放在同一个页面。</p></div><div class="hero-symbol">⌘</div></div>
+ <div class="metrics">
+  <div class="metric"><strong id="mCourses">—</strong><small>全校课程</small></div>
+  <div class="metric"><strong id="mRooms">—</strong><small>已知教室 / 考场</small></div>
+  <div class="metric"><strong id="mLabs">—</strong><small>学校列出的 CS 机房</small></div>
+  <div class="metric"><strong id="mEvents">—</strong><small>每周排课时段</small></div>
+ </div>
+ <section class="panel" id="focus">
+  <div class="heading"><div><h2>核心电脑机房</h2><p class="subtext" id="focusCaption">优先展示 GPU 机房、X Lab 和 Java Lab</p></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="meta" id="focusCount"></span><button class="btn secondary tiny" id="jumpFilters">更改查询时间</button></div></div>
+  <div class="lab-grid" id="labCards"></div>
+ </section>
+ <section class="panel" id="filters">
+  <div class="heading"><div><h2>查询教室空档</h2><p class="subtext">不必逐门搜索课程，直接按时间查教学楼</p></div><div class="title-side"><i class="small-dot"></i>Fall 2026</div></div>
+  <div class="filters">
+   <div class="field"><label for="date">查询日期</label><input id="date" type="date" value="2026-11-13" min="2026-09-01" max="2026-12-22"/></div>
+   <div class="field"><label for="from">开始时间</label><input id="from" type="time" value="13:00"/></div>
+   <div class="field"><label for="to">结束时间</label><input id="to" type="time" value="15:00"/></div>
+   <div class="field"><label for="building">教学楼</label><select id="building"></select></div>
+   <div class="field"><label for="keyword">关键词 / 教室号 / 课程</label><input id="keyword" placeholder="例如 3107 或 COMP"/></div>
+  </div>
+  <div class="toolbar">
+   <div class="segments" role="group" aria-label="房间范围">
+    <button class="segment active" id="filterLabs">重点电脑机房</button>
+    <button class="segment" id="filterFocus">Erie + Lambton</button>
+    <button class="segment" id="filterAll">全校教室</button>
+   </div>
+   <button class="btn secondary" id="btnReset">重置查询</button>
+  </div>
+  <div class="notice"><b>空档 ≠ 可使用许可：</b>这里只判断已知课程及考试是否占用。没有记录不代表教室已开放，尤其是 walk-in 机房、研究实验室和临时预约场地。设备资料可能发生变更，现场实际为准。</div>
+ </section>
+ <section class="panel" id="all">
+  <div class="heading"><div><h2>所有房间 · 查询结果</h2><p class="subtext">点击任意房间查看详细周课表</p></div><span class="meta" id="allCount"></span></div>
+  <div class="roomlist"><table><thead><tr><th>教室</th><th>类别</th><th>选定时段</th><th>学期周课次 / 查看</th></tr></thead><tbody id="roomRows"></tbody></table></div>
+ </section>
+ <div class="two-col">
+  <section class="panel" id="weekly">
+   <div class="heading"><div><h2>选定日期所在周 · 排课与空档</h2><p class="subtext">07:00–23:00 · 按选定日期对应的一周计算，考试周也适用</p></div><span class="meta" id="weekCaption">星期一至日</span></div>
+   <div class="section-intro"><div><div class="room-heading" id="selectedTitle">Erie Hall · 3119</div><div class="room-sub" id="selectedSub"></div></div><button class="btn secondary tiny" id="jumpSpecs">查看设备</button></div>
+   <div class="week-scroll"><div class="week" id="weeklyGrid"></div></div>
+   <div class="room-day-legend"><span>▰ 课程 / 实验课</span><span style="color:#167c74">▰ 课表未占用区间</span><span style="color:#ba7c35">▰ 橙色为考试安排</span></div>
+   <div class="note-title">指定日期 · 详细排程</div><div class="cards" id="dateEvents"></div>
+  </section>
+  <section class="panel" id="inventory">
+   <div class="heading"><div><h2>机房与设备档案</h2><p class="subtext">学校公布资料与现场记录分开保存</p></div><span class="meta" id="sourceFlag"></span></div>
+   <div class="room-heading" style="font-size:21px" id="hardwareName"></div><div class="room-sub" id="hardwareSubtitle"></div>
+   <div class="detail-row" id="officialSpecs"></div>
+   <div class="source" id="officialSource"></div>
+   <div class="note-title">我的实地记录 <span class="muted" style="font-weight:500">· 保存在此浏览器</span></div>
+   <form id="hardwareForm">
+    <div class="note-form">
+     <div class="field"><label for="deviceCount">电脑台数</label><input id="deviceCount" placeholder="例如 27" inputmode="numeric"/></div>
+     <div class="field"><label for="model">品牌 / 型号</label><input id="model" placeholder="Dell Precision ..."/></div>
+     <div class="field"><label for="cpu">CPU</label><input id="cpu" placeholder="Ryzen / Intel ..."/></div>
+     <div class="field"><label for="gpu">GPU</label><input id="gpu" placeholder="NVIDIA / AMD ..."/></div>
+     <div class="field"><label for="memory">RAM</label><input id="memory" placeholder="32 GB"/></div>
+     <div class="field"><label for="os">操作系统</label><input id="os" placeholder="Debian / Windows ..."/></div>
+     <div class="field wide"><label for="access">开放情况</label><input id="access" placeholder="例如周一至周五；需门禁"/></div>
+     <div class="field wide"><label for="notes">补充说明 / 现场照片文件名</label><textarea id="notes" rows="3" placeholder="记录键盘、屏幕、插座、设备年份、开放规则等"></textarea></div>
+     <div class="field wide"><label for="checked">现场核实日期</label><input id="checked" type="date"/></div>
+    </div>
+    <div class="form-tools"><button type="submit" class="btn">保存这间教室</button><button type="button" class="btn secondary" id="clearNote">清除我的记录</button></div>
+   </form>
+   <div class="source" id="localStatus">数据仅保存在这个浏览器的本地存储中，不上传给学校。</div>
+   <div class="form-tools"><button class="btn ghost" id="exportNotes">导出设备记录 JSON</button><button class="btn ghost" id="importNotes">导入以前的记录</button><input type="file" id="importFile" accept=".json,application/json" hidden/></div>
+   <div class="info-note">换设备或清理浏览器数据前请导出 JSON 备份。后续现场核实可以覆盖你自己的记录，不会改变学校来源的原始设备信息。</div>
+  </section>
+ </div>
+ <footer>教学时间、教室与考试：UWinsite Student / 官方 Fall 2026 Exam Schedule；设备：School of Computer Science Labs / CTL Classroom Database。仅为课程排课快照，不提供实时门禁或空闲保证。<br>本网站是公开可访问的排课快照；个人现场设备笔记只保存在你的浏览器，不上传服务器。</footer>
+</main></div>
+<div id="toast" role="status"></div>
+<div id="loadStatus" style="position:fixed;left:24px;bottom:18px;padding:12px 16px;background:#fff;border:1px solid #ccdde8;border-radius:9px;box-shadow:0 5px 20px #2034491b;z-index:20">正在加载课程数据…</div>
+<script>
+(async function () {
+  try {
+    const response = await fetch('./data.json.gz', {cache:'no-cache'});
+    if (!response.ok) throw new Error('排课数据 HTTP '+response.status);
+    const bytes = new Uint8Array(await response.arrayBuffer());
+    let decoded;
+    if (bytes[0]===31 && bytes[1]===139) {
+      if (!('DecompressionStream' in window)) throw new Error('此浏览器暂不支持压缩数据，请使用最新版 Chrome / Safari / Edge');
+      decoded = await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
+    } else {
+      decoded = new TextDecoder().decode(bytes);
+    }
+    window.WD = JSON.parse(decoded);
+    const script = document.createElement('script');
+    script.src = './app.js';
+    script.onerror = () => { document.getElementById('loadStatus').textContent = '网页脚本加载失败，请检查网络连接'; };
+    document.body.appendChild(script);
+    document.getElementById('loadStatus').remove();
+  } catch (error) {
+    const el = document.getElementById('loadStatus');
+    el.textContent = '页面数据加载失败：'+error.message+'。请刷新或稍后再试。';
+    el.style.color = '#9b342e';
+  }
+})();
+</script>
+</body></html>

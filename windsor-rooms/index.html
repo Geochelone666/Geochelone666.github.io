@@ -1,5 +1,5 @@
 <!doctype html><html lang="zh-CN"><head>
-<meta charset="utf-8"/><meta name="robots" content="noindex,nofollow"/><meta name="referrer" content="strict-origin-when-cross-origin"/><meta name="description" content="University of Windsor classroom schedule lookup, Erie Hall and Lambton Tower CS labs, Fall 2026."/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta charset="utf-8"/><meta name="robots" content="noindex,nofollow"/><meta name="referrer" content="strict-origin-when-cross-origin"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
 <meta name="color-scheme" content="light"/><title>Windsor Rooms · 教室空档和电脑机房</title>
 <link rel="stylesheet" href="./styles.css"/>
 </head><body>
@@ -7,7 +7,7 @@
 <aside class="sidebar">
  <div class="brand"><div class="brand-icon">W</div><div><div class="brand-name">Windsor Rooms</div><div class="brand-small">CAMPUS SPACE INTELLIGENCE</div></div></div>
  <nav><div class="nav-title">导航 · Explore</div>
- <button class="nav-link active" data-scroll="focus"><span class="mark">▦</span>电脑机房</button>
+ <button class="nav-link active" data-scroll="focus"><span class="mark">▦</span>COMP LAB 地点</button>
  <button class="nav-link" data-scroll="weekly"><span class="mark">▤</span>每周课表</button>
  <button class="nav-link" data-scroll="inventory"><span class="mark">▣</span>设备资料</button>
  <button class="nav-link" data-scroll="all"><span class="mark">⌕</span>全校教室</button>
@@ -15,16 +15,16 @@
  <div class="nav-note"><div style="font-size:10px;letter-spacing:.1em">DATA COVERAGE</div><strong>2026 · Fall</strong><div>课程排课与期末考试快照已合并；重点关注 Lambton Tower、Erie Hall。</div><div style="margin-top:11px;color:#8fc6c1">● 离线可查 · 不需要再次登录</div></div>
 </aside>
 <main class="workspace">
- <div class="topline"><span class="eyebrow">CAMPUS / CLASSROOM FINDER</span><span class="version">v3.1 · campus-wide inventory</span></div>
- <div class="hero"><div><div class="eyebrow" style="color:#237a76">MAKE TIME FOR WHAT MATTERS</div><h1>看看哪间电脑机房可能空着。</h1><p class="subtext">先看 Lambton Tower 和 Erie Hall 的机房，再按日期、教室与星期查课。把课程、任课教师、硬件配置和待核实信息放在同一个页面。</p></div><div class="hero-symbol">⌘</div></div>
+ <div class="topline"><span class="eyebrow">CAMPUS / CLASSROOM FINDER</span><span class="version">v4.0 · COMP LAB inventory</span></div>
+ <div class="hero"><div><div class="eyebrow" style="color:#237a76">MAKE TIME FOR WHAT MATTERS</div><h1>Fall 2026 的 COMP LAB 排课直接揭示了 12 个教学地点；4 间 CS 通用学生机房只是其中一部分，且 LAB 教室不一定有学生电脑。</h1><p class="subtext">先看 Lambton Tower 和 Erie Hall 的机房，再按日期、教室与星期查课。把课程、任课教师、硬件配置和待核实信息放在同一个页面。</p></div><div class="hero-symbol">⌘</div></div>
  <div class="metrics">
-  <div class="metric"><strong id="mCourses">—</strong><small>全校课程</small></div>
-  <div class="metric"><strong id="mRooms">—</strong><small>已知教室 / 考场</small></div>
-  <div class="metric"><strong id="mLabs">—</strong><small>已收录电脑设施（含受限）</small></div>
-  <div class="metric"><strong id="mEvents">—</strong><small>每周排课时段</small></div>
+  <div class="metric"><strong id="mCourses">—</strong><small>COMP 课程</small></div>
+  <div class="metric"><strong id="mRooms">—</strong><small>COMP LAB 教学地点</small></div>
+  <div class="metric"><strong id="mLabs">—</strong><small>校方公布的 CS 通用机房</small></div>
+  <div class="metric"><strong id="mEvents">—</strong><small>不同 LAB Section</small></div>
  </div>
  <section class="panel" id="focus">
-  <div class="heading"><div><h2>电脑机房与计算设施</h2><p class="subtext" id="focusCaption">优先展示 GPU 机房、X Lab 和 Java Lab</p></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="meta" id="focusCount"></span><button class="btn secondary tiny" id="jumpFilters">更改查询时间</button></div></div>
+  <div class="heading"><div><h2>COMP 实验课 · 场地全览</h2><p class="subtext" id="focusCaption">按 2026 秋季实际 LAB Section 统计。普通教室不等于配有学生工作站，请看下方场地类型标记。</p></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="meta" id="focusCount"></span><button class="btn secondary tiny" id="jumpFilters">更改查询时间</button></div></div>
   <div class="lab-grid" id="labCards"></div>
  </section>
  <section class="panel" id="filters">
@@ -38,17 +38,19 @@
   </div>
   <div class="toolbar">
    <div class="segments" role="group" aria-label="房间范围">
-    <button class="segment active" id="filterLabs">全部电脑设施</button>
+    <button class="segment active" id="filterComp">COMP LAB · 12 地点</button>
+    <button class="segment" id="filterLabs">CS 学生机房 · 4</button>
     <button class="segment" id="filterFocus">Erie + Lambton</button>
+    <button class="segment" id="filterOther">全校其他电脑设施 · 17</button>
     <button class="segment" id="filterAll">全校教室</button>
    </div>
    <button class="btn secondary" id="btnReset">重置查询</button>
   </div>
-  <div class="notice"><b>空档 ≠ 可使用许可：</b>这里只判断已知课程及考试是否占用。没有记录不代表教室已开放，尤其是 walk-in 机房、研究实验室和临时预约场地。设备资料可能发生变更，现场实际为准。</div>
+  <div class="notice"><b>特别注意：</b>UWinsite 的 LAB 是教学形式，不代表房间配备学生工作站。Dillon、Memorial、Chrysler 等房间在学校课堂数据库中属于普通教室，可能只有讲台电脑。<br><b>空档 ≠ 可使用许可：</b>这里只判断已知课程及考试是否占用。没有记录不代表教室已开放，尤其是 walk-in 机房、研究实验室和临时预约场地。设备资料可能发生变更，现场实际为准。</div>
  </section>
  <section class="panel" id="all">
-  <div class="heading"><div><h2>所有房间 · 查询结果</h2><p class="subtext">点击任意房间查看详细周课表</p></div><span class="meta" id="allCount"></span></div>
-  <div class="roomlist"><table><thead><tr><th>教室</th><th>类别</th><th>选定时段</th><th>学期周课次 / 查看</th></tr></thead><tbody id="roomRows"></tbody></table></div>
+  <div class="heading"><div><h2>所选类别 · 教室与排课结果</h2><p class="subtext">点击任意房间查看详细周课表</p></div><span class="meta" id="allCount"></span></div>
+  <div class="roomlist"><table><thead><tr><th>教室</th><th>类别</th><th>选定时段</th><th>排课 / 查看</th></tr></thead><tbody id="roomRows"></tbody></table></div>
  </section>
  <div class="two-col">
   <section class="panel" id="weekly">
@@ -83,34 +85,23 @@
    <div class="info-note">换设备或清理浏览器数据前请导出 JSON 备份。后续现场核实可以覆盖你自己的记录，不会改变学校来源的原始设备信息。</div>
   </section>
  </div>
- <footer><a href="./labs.csv" download>下载电脑设施清单 CSV</a> · <a href="./data.json.gz" download>下载课程排程压缩数据</a><br>教学时间、教室与考试：UWinsite Student / 官方 Fall 2026 Exam Schedule；设备：School of Computer Science Labs / CTL Classroom Database。仅为课程排课快照，不提供实时门禁或空闲保证。<br>本网站是公开可访问的排课快照；个人现场设备笔记只保存在你的浏览器，不上传服务器。</footer>
+ <footer><a href="./comp-labs.csv" download>下载 COMP LAB 场地与时间 CSV</a> · <a href="./labs.csv" download>下载全校电脑设施 CSV</a><br>教学时间、教室与考试：UWinsite Student / 官方 Fall 2026 Exam Schedule；设备：School of Computer Science Labs / CTL Classroom Database。仅为课程排课快照，不提供实时门禁或空闲保证。<br>此网页公开可访问；你的设备现场笔记只保存在当前浏览器，不会上传服务器。</footer>
 </main></div>
 <div id="toast" role="status"></div>
-<div id="loadStatus" style="position:fixed;left:24px;bottom:18px;padding:12px 16px;background:#fff;border:1px solid #ccdde8;border-radius:9px;box-shadow:0 5px 20px #2034491b;z-index:20">正在加载课程数据…</div>
+<div id="loadStatus" style="position:fixed;bottom:24px;left:24px;background:white;padding:10px;border:1px solid #ddd;border-radius:9px;z-index:30">正在加载课程数据…</div>
 <script>
 (async function () {
-  try {
-    const response = await fetch('./data.json.gz', {cache:'no-cache'});
-    if (!response.ok) throw new Error('排课数据 HTTP '+response.status);
-    const bytes = new Uint8Array(await response.arrayBuffer());
-    let decoded;
-    if (bytes[0]===31 && bytes[1]===139) {
-      if (!('DecompressionStream' in window)) throw new Error('此浏览器暂不支持压缩数据，请使用最新版 Chrome / Safari / Edge');
-      decoded = await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
-    } else {
-      decoded = new TextDecoder().decode(bytes);
-    }
-    window.WD = JSON.parse(decoded);
-    const script = document.createElement('script');
-    script.src = './app.js';
-    script.onerror = () => { document.getElementById('loadStatus').textContent = '网页脚本加载失败，请检查网络连接'; };
-    document.body.appendChild(script);
-    document.getElementById('loadStatus').remove();
-  } catch (error) {
-    const el = document.getElementById('loadStatus');
-    el.textContent = '页面数据加载失败：'+error.message+'。请刷新或稍后再试。';
-    el.style.color = '#9b342e';
-  }
+ try {
+  const response=await fetch('./data.json.gz',{cache:'no-cache'});
+  if(!response.ok) throw new Error('排课数据 HTTP '+response.status);
+  const bytes=new Uint8Array(await response.arrayBuffer());
+  const text=bytes[0]===31&&bytes[1]===139
+   ? await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'))).text()
+   : new TextDecoder().decode(bytes);
+  window.WD=JSON.parse(text);
+  const s=document.createElement('script');s.src='./app.js';s.onerror=()=>{document.getElementById('loadStatus').textContent='程序载入失败，请刷新网页';};document.body.append(s);
+  document.getElementById('loadStatus').remove();
+ } catch(e){let el=document.getElementById('loadStatus');if(el){el.textContent='数据加载失败：'+e.message;el.style.color='#b94037';}}
 })();
 </script>
 </body></html>

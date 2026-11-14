@@ -4,17 +4,30 @@ const escapeHTML=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;'
 const official=WD.hardware,examRecords=WD.events,rooms=WD.rooms;
 const weekdays=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 const roomMeta=new Map([...official.labs,...official.rooms].map(r=>[r.building+'|'+r.room,r]));
-const priority=official.labs.map(r=>r.building+'|'+r.room);
+const compSites=WD.compLab.sites,compSummary=WD.compLab.summary;
+const compMap=new Map(compSites.map(r=>[r.building+'|'+r.room,r]));
+const priority=compSummary.confirmedGeneralCSLabs;
+const studentLabKeys=new Set(priority);
+for(const c of compSites){
+ const key=c.building+'|'+c.room;
+ if(!roomMeta.has(key))roomMeta.set(key,{
+  building:c.building,room:c.room,capacity:null,vendor:'',model:'没有已证实的学生工作站',cpu:'未证实',gpu:'未证实',ram:'未证实',os:'未证实',software:'',
+  name:c.classification==='cs-teaching-lab-unverified-workstations'?'CS 教学 Lab（设备待核实）':'COMP LAB 普通教学教室',
+  short:c.classification==='cs-teaching-lab-unverified-workstations'?'Lab 2103 · 学生电脑待核实':'普通教室 · 学生电脑未证实',
+  access:c.classification==='cs-teaching-lab-unverified-workstations'?'学校资料称 Lab 2103，未确认公共进入与学生机型':'该房间用于 COMP LAB 教学，但不是已证实的电脑工作站机房',
+  accessLevel:'unknown',confidence:'lab-schedule-not-hardware',type:'comp-lab-classroom',source:c.source,notes:c.evidence
+ });
+}
 const storageName='windsor-rooms-local-inspections-v3';
 const notes=(()=>{try{return JSON.parse(localStorage.getItem(storageName))||{}}catch{return {}}})();
 const dayByName=weekday=>DC[D.indexOf(weekday)];
 const getLocalDate=()=>{const now=new Date();const d=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Toronto',year:'numeric',month:'2-digit',day:'2-digit'}).format(now);return /^\d{4}-\d{2}-\d{2}$/.test(d)?d:'2026-11-13'};
 const initial=getLocalDate();
 $('date').value=initial>'2026-12-22'?'2026-11-13':initial<'2026-09-01'?'2026-11-13':initial;
-$('mCourses').textContent=WD.info.courses;
-$('mRooms').textContent=rooms.length;
-$('mLabs').textContent=official.labs.length;
-$('mEvents').textContent=WD.info.classes.toLocaleString();
+$('mCourses').textContent=compSummary.differentCOMPcourses;
+$('mRooms').textContent=compSummary.labSites;
+$('mLabs').textContent=priority.length;
+$('mEvents').textContent=compSummary.uniqueLABSections;
 const faculty=new Map(Object.entries(WD.faculty||{}));
 const courseMap=new Map();for(const r of examRecords){
  const k=r[1]+'|'+r[2];if(!courseMap.has(k))courseMap.set(k,[]);courseMap.get(k).push(r);
@@ -36,11 +49,12 @@ function statusFor(key,settings){
 function toast(message){const el=$('toast');el.textContent=message;el.style.display='block';clearTimeout(window.__toastTimeout);window.__toastTimeout=setTimeout(()=>el.style.display='none',2800)}
 const opt=(v,text)=>'<option value="'+escapeHTML(v)+'">'+escapeHTML(text)+'</option>';
 $('building').innerHTML=opt('','所有楼宇')+[...new Set(rooms.map(r=>r[0]))].sort().map(x=>opt(x,x)).join('');
-let mode='labs',selected='Erie Hall|3119';
-function selectMode(m){mode=m;for(const [id,v] of [['filterLabs','labs'],['filterFocus','focus'],['filterAll','all']]){$(id).classList.toggle('active',v===m);}renderResults();}
-const relevant=()=>{let a=mode==='labs'?rooms.filter(r=>isTrueLab(keyOf(r))):mode==='focus'?rooms.filter(r=>['Erie Hall','Lambton Tower'].includes(r[0])):[...rooms];
+let mode='comp',selected='Erie Hall|3119';
+function selectMode(m){mode=m;for(const [id,v] of [['filterComp','comp'],['filterLabs','labs'],['filterFocus','focus'],['filterOther','other'],['filterAll','all']]){$(id).classList.toggle('active',v===m);}renderResults();}
+const relevant=()=>{let a=mode==='comp'?rooms.filter(r=>compMap.has(keyOf(r))):mode==='labs'?rooms.filter(r=>studentLabKeys.has(keyOf(r))):mode==='other'?rooms.filter(r=>official.labs.some(l=>l.building+'|'+l.room===keyOf(r))):mode==='focus'?rooms.filter(r=>['Erie Hall','Lambton Tower'].includes(r[0])):[...rooms];
  const s=current();if(s.building)a=a.filter(r=>r[0]===s.building);if(s.q.length)a=a.filter(r=>{const k=keyOf(r);const profile=roomMeta.get(k);const txt=[r.join(' '),profile?.name||'',profile?.short||'',profile?.gpu||'',...(courseMap.get(k)||[]).map(x=>x[9]+' '+x[13]+' '+(faculty.get(String(x[12]))||[]).join(' '))].join(' ').toLowerCase();return s.q.every(q=>txt.includes(q));});
- return a.sort((a,b)=>{const ap=priority.indexOf(keyOf(a)),bp=priority.indexOf(keyOf(b));return (ap<0?999:ap)-(bp<0?999:bp)||((a[0]==='Erie Hall'?0:a[0]==='Lambton Tower'?1:2)-(b[0]==='Erie Hall'?0:b[0]==='Lambton Tower'?1:2))||a[0].localeCompare(b[0])||a[1].localeCompare(b[1],undefined,{numeric:true})});};
+ return a.sort((a,b)=>{if(mode==='comp'){const aa=compMap.get(keyOf(a)),bb=compMap.get(keyOf(b));return (bb?.sectionCount||0)-(aa?.sectionCount||0)||a[0].localeCompare(b[0])||a[1].localeCompare(b[1],undefined,{numeric:true});}
+ const ap=priority.indexOf(keyOf(a)),bp=priority.indexOf(keyOf(b));return (ap<0?999:ap)-(bp<0?999:bp)||((a[0]==='Erie Hall'?0:a[0]==='Lambton Tower'?1:2)-(b[0]==='Erie Hall'?0:b[0]==='Lambton Tower'?1:2))||a[0].localeCompare(b[0])||a[1].localeCompare(b[1],undefined,{numeric:true})});};
 function knownGaps(key,date){
  if(!hasRegular(key))return [];
  const events=byRoomDate(key,date).sort((a,b)=>a[7].localeCompare(b[7]));
@@ -51,11 +65,17 @@ function knownGaps(key,date){
  if(cursor<end)gaps.push([cursor,end]);
  return gaps.filter(([a,b])=>(Number(b.slice(0,2))*60+Number(b.slice(3)))-(Number(a.slice(0,2))*60+Number(a.slice(3)))>=45);
 }
+function displayStatus(key,s){
+ const c=compMap.get(key);
+ if(c&&s.kind==='good'&&c.classification==='ordinary-classroom')return {kind:'caution',label:'普通教室 / 无学生电脑证据'};
+ if(c&&s.kind==='good'&&c.classification==='cs-teaching-lab-unverified-workstations')return {kind:'caution',label:'Lab 场地 / 电脑待核实'};
+ return s;
+}
 function labCard(key){
- const p=current(),[building,room]=key.split('|'),m=roomMeta.get(key),s=statusFor(key,p);
+ const p=current(),[building,room]=key.split('|'),m=roomMeta.get(key),s=displayStatus(key,statusFor(key,p)),comp=compMap.get(key);
  if(['law-only','cs-majors','business-limited'].includes(m.accessLevel)&&s.kind==='good'){s.kind='caution';s.label='限制使用'}
  if(['official-history','older-official','official-2022-23','official-family-partition'].includes(m.confidence)&&s.kind==='good'){s.kind='caution';s.label='使用待核实'}
- const chips=[m.capacity?m.capacity+' 台':m.capacityLowerBound?'至少 '+m.capacityLowerBound+' 台':'台数未公布',m.gpu&&!m.gpu.startsWith('未')?m.gpu.includes('A2000')?'双 NVIDIA A2000':m.gpu:'GPU 待核实',m.ram||m.cpu||'配置待核实'].slice(0,3);
+ const chips=comp?[(comp.sectionCount+' 个 LAB Section'),comp.courses.join(' / '),comp.classification==='verified-student-workstations'?'CS 学生工作站机房':comp.classification==='cs-teaching-lab-unverified-workstations'?'校方称 Lab · 电脑需核实':'普通教室 · 非已证实学生电脑机房']:[m.capacity?m.capacity+' 台':m.capacityLowerBound?'至少 '+m.capacityLowerBound+' 台':'台数未公布',m.gpu&&!m.gpu.startsWith('未')?m.gpu.includes('A2000')?'双 NVIDIA A2000':m.gpu:'GPU 待核实',m.ram||m.cpu||'配置待核实'].slice(0,3);
  const gaps=knownGaps(key,p.date).slice(0,2);const emptyHint=hasRegular(key)?('已知空档：'+(gaps.length?gaps.map(x=>x.join('–')).join(' / '):'该日没有 ≥45 分钟空档')):'未收录常规课程时间：开放情况需现场确认';
  return '<article class="lab-card '+(selected===key?'selected':'')+'" data-room="'+escapeHTML(key)+'" role="button" tabindex="0">'+
  '<div class="lab-head"><div><div class="location">'+escapeHTML(building.toUpperCase())+' · '+escapeHTML(room)+'</div><div class="lab-name">'+escapeHTML(m.name)+'</div></div><span class="pill '+s.kind+'">'+escapeHTML(s.label)+'</span></div>'+
@@ -64,18 +84,19 @@ function labCard(key){
 }
 function renderResults(){
  const s=current(),valid=s.date&&s.from&&s.to&&s.from<s.to,arr=relevant(),allLabs=official.labs.map(x=>keyOf([x.building,x.room]));
- const show=allLabs.filter(k=>arr.some(a=>keyOf(a)===k));
- $('labCards').innerHTML=show.length?show.map(labCard).join(''):'<p class="muted">此筛选下没有重点计算机机房。</p>';
- $('focusCount').textContent=show.length+' 条设施记录（含分区与受限）';
+ const choice=mode==='comp'?compSites.map(c=>c.building+'|'+c.room):mode==='labs'?priority:mode==='other'?allLabs:mode==='focus'?[...new Set([...compSites.filter(c=>['Erie Hall','Lambton Tower'].includes(c.building)).map(c=>c.building+'|'+c.room),...priority.filter(x=>x.startsWith('Erie Hall|')||x.startsWith('Lambton Tower|'))])]:allLabs;
+ const show=choice.filter(k=>arr.some(a=>keyOf(a)===k));
+ $('labCards').innerHTML=show.length?show.map(labCard).join(''):'<p class="muted">此筛选下没有对应场地。</p>';
+ $('focusCount').textContent=mode==='comp'?show.length+' 个本学期 LAB 场地 · 全部34个Section':mode==='labs'?show.length+' 间官方 CS 通用机房':show.length+' 条设施/场地记录';
  const stats={busy:0,good:0,caution:0};
  const markup=arr.map(x=>{
-  const k=keyOf(x),m=roomMeta.get(k),st=valid?statusFor(k,s):{kind:'caution',label:'日期或时间无效'};
+  const k=keyOf(x),m=roomMeta.get(k),st=valid?displayStatus(k,statusFor(k,s)):{kind:'caution',label:'日期或时间无效'};
   stats[st.kind]=(stats[st.kind]||0)+1;
-  const term=(courseMap.get(k)||[]).filter(t=>t[0]==='class').length;
-  return '<tr><td><button class="link-room" data-open="'+escapeHTML(k)+'">'+escapeHTML(x[0]+' '+x[1])+'</button></td><td>'+escapeHTML(m?.short||(x[0]==='Erie Hall'||x[0]==='Lambton Tower'?'教室 / 设备待核实':'普通教室或专用实验室'))+'</td><td><span class="pill '+st.kind+'">'+escapeHTML(st.label)+'</span></td><td><span class="dim">'+term+' 条/周</span>　<button class="btn tiny secondary" data-open="'+escapeHTML(k)+'">查看</button></td></tr>';
+  const term=(courseMap.get(k)||[]).filter(t=>t[0]==='class').length;const comp=compMap.get(k);const recordLabel=mode==='comp'&&comp?comp.sectionCount+' 个COMP LAB Section':term+' 条周排课记录';
+  return '<tr><td><button class="link-room" data-open="'+escapeHTML(k)+'">'+escapeHTML(x[0]+' '+x[1])+'</button></td><td>'+escapeHTML(m?.short||(x[0]==='Erie Hall'||x[0]==='Lambton Tower'?'教室 / 设备待核实':'普通教室或专用实验室'))+'</td><td><span class="pill '+st.kind+'">'+escapeHTML(st.label)+'</span></td><td><span class="dim">'+escapeHTML(recordLabel)+'</span>　<button class="btn tiny secondary" data-open="'+escapeHTML(k)+'">查看</button></td></tr>';
  }).join('');
  $('roomRows').innerHTML=markup||'<tr><td colspan="4">此范围没有找到匹配的房间。</td></tr>';
- $('allCount').textContent=arr.length+' 间 · '+stats.good+' 间课表未占用';
+ $('allCount').textContent=arr.length+' 个场地 · '+stats.good+' 个已知课表无占用';
  if(!valid)toast('开始时间必须早于结束时间');
 }
 function groupEvents(events){
@@ -148,8 +169,8 @@ function selectRoom(key){
  if(!rooms.some(r=>keyOf(r)===key))return;
  selected=key;renderResults();renderWeek();renderHardware();
 }
-for(const [id,m] of [['filterLabs','labs'],['filterFocus','focus'],['filterAll','all']])$(id).onclick=()=>selectMode(m);
-$('btnReset').onclick=()=>{$('date').value=initial>'2026-12-22'?'2026-11-13':initial;$('from').value='13:00';$('to').value='15:00';$('building').value='';$('keyword').value='';selectMode('labs');renderWeek()};
+for(const [id,m] of [['filterComp','comp'],['filterLabs','labs'],['filterFocus','focus'],['filterOther','other'],['filterAll','all']])$(id).onclick=()=>selectMode(m);
+$('btnReset').onclick=()=>{$('date').value=initial>'2026-12-22'?'2026-11-13':initial;$('from').value='13:00';$('to').value='15:00';$('building').value='';$('keyword').value='';selectMode('comp');renderWeek()};
 for(const k of ['date','from','to','building','keyword'])$(k).addEventListener('change',()=>{renderResults();if(k==='date')renderWeek()});
 $('keyword').addEventListener('input',()=>renderResults());
 $('labCards').addEventListener('click',e=>{const el=e.target.closest('[data-room]');if(el){selectRoom(el.dataset.room);$('weekly').scrollIntoView({behavior:'smooth',block:'start'})}});

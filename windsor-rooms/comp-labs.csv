@@ -1,0 +1,35 @@
+﻿Building,Room,Course,LAB Section,Class Number,Weekday,Start,End,Classification,Workstation evidence,Source URL
+Erie Hall,3119,COMP 2560,51,2367,Monday,11:30,12:50,verified-student-workstations,计算机学院公布学生工作站机房,https://help.cs.uwindsor.ca/books/labs
+Erie Hall,3119,COMP 2560,53,2369,Monday,13:00,14:20,verified-student-workstations,计算机学院公布学生工作站机房,https://help.cs.uwindsor.ca/books/labs
+Erie Hall,3119,COMP 2540,51,2361,Monday,14:30,15:50,verified-student-workstations,计算机学院公布学生工作站机房,https://help.cs.uwindsor.ca/books/labs
+Erie Hall,3119,COMP 2540,53,2363,Monday,16:00,17:20,verified-student-workstations,计算机学院公布学生工作站机房,https://help.cs.uwindsor.ca/books/labs
+Erie Hall,3119,COMP 2540,54,2364,Tuesday,17:30,18:50,verified-student-workstations,计算机学院公布学生工作站机房,https://help.cs.uwindsor.ca/books/labs
+Erie Hall,3119,COMP 2560,52,2368,Wednesday,11:30,12:50,verified-student-workstations,计算机学院公布学生工作站机房,https://help.cs.uwindsor.ca/books/labs
+Erie Hall,3119,COMP 2560,54,2370,Wednesday,13:00,14:20,verified-student-workstations,计算机学院公布学生工作站机房,https://help.cs.uwindsor.ca/books/labs
+Erie Hall,3119,COMP 2540,52,2362,Wednesday,14:30,15:50,verified-student-workstations,计算机学院公布学生工作站机房,https://help.cs.uwindsor.ca/books/labs
+Erie Hall,3119,COMP 1410,51,2345,Thursday,19:00,20:20,verified-student-workstations,计算机学院公布学生工作站机房,https://help.cs.uwindsor.ca/books/labs
+Erie Hall,3119,COMP 1410,52,2346,Thursday,20:30,21:50,verified-student-workstations,计算机学院公布学生工作站机房,https://help.cs.uwindsor.ca/books/labs
+West Library,305C,COMP 1400,51,2336,Monday,14:30,15:50,verified-student-workstations,计算机学院公布学生工作站机房,https://help.cs.uwindsor.ca/books/labs
+West Library,305C,COMP 1400,53,2338,Monday,16:00,17:20,verified-student-workstations,计算机学院公布学生工作站机房,https://help.cs.uwindsor.ca/books/labs
+West Library,305C,COMP 1400,55,2340,Monday,17:30,18:50,verified-student-workstations,计算机学院公布学生工作站机房,https://help.cs.uwindsor.ca/books/labs
+West Library,305C,COMP 1400,52,2337,Wednesday,14:30,15:50,verified-student-workstations,计算机学院公布学生工作站机房,https://help.cs.uwindsor.ca/books/labs
+West Library,305C,COMP 1400,54,2339,Wednesday,16:00,17:20,verified-student-workstations,计算机学院公布学生工作站机房,https://help.cs.uwindsor.ca/books/labs
+Lambton Tower,2103,COMP 2120,51,2350,Thursday,10:00,11:20,cs-teaching-lab-unverified-workstations,2025 校方工程公告称 Lab 2103；本学期 COMP 2120 在此上 LAB；学生工作站与开放权限未证实,https://www.uwindsor.ca/facilityservices/sites/uwindsor.ca.facilityservices/files/nosi_lambtonerie_2nd_3rd_floor_data_fiber_work_jan20-feb.21_0.pdf
+Lambton Tower,2103,COMP 2120,52,2351,Thursday,13:00,14:20,cs-teaching-lab-unverified-workstations,2025 校方工程公告称 Lab 2103；本学期 COMP 2120 在此上 LAB；学生工作站与开放权限未证实,https://www.uwindsor.ca/facilityservices/sites/uwindsor.ca.facilityservices/files/nosi_lambtonerie_2nd_3rd_floor_data_fiber_work_jan20-feb.21_0.pdf
+Lambton Tower,2103,COMP 2120,53,2352,Thursday,17:30,18:50,cs-teaching-lab-unverified-workstations,2025 校方工程公告称 Lab 2103；本学期 COMP 2120 在此上 LAB；学生工作站与开放权限未证实,https://www.uwindsor.ca/facilityservices/sites/uwindsor.ca.facilityservices/files/nosi_lambtonerie_2nd_3rd_floor_data_fiber_work_jan20-feb.21_0.pdf
+Lambton Tower,2103,COMP 2120,54,2353,Thursday,19:00,20:20,cs-teaching-lab-unverified-workstations,2025 校方工程公告称 Lab 2103；本学期 COMP 2120 在此上 LAB；学生工作站与开放权限未证实,https://www.uwindsor.ca/facilityservices/sites/uwindsor.ca.facilityservices/files/nosi_lambtonerie_2nd_3rd_floor_data_fiber_work_jan20-feb.21_0.pdf
+Dillon Hall,355,COMP 2310,51,2356,Tuesday,16:00,17:20,ordinary-classroom,本学期 COMP 课程标为 LAB，但校园课堂数据库标为 General（普通教室）；讲台电脑不等于学生工作站,https://ctl2.uwindsor.ca/classrooms/DH/355/
+Dillon Hall,355,COMP 2310,53,2358,Wednesday,14:30,15:50,ordinary-classroom,本学期 COMP 课程标为 LAB，但校园课堂数据库标为 General（普通教室）；讲台电脑不等于学生工作站,https://ctl2.uwindsor.ca/classrooms/DH/355/
+Dillon Hall,355,COMP 2310,52,2357,Thursday,16:00,17:20,ordinary-classroom,本学期 COMP 课程标为 LAB，但校园课堂数据库标为 General（普通教室）；讲台电脑不等于学生工作站,https://ctl2.uwindsor.ca/classrooms/DH/355/
+Memorial Hall,311,COMP 1000,51,2324,Tuesday,16:00,17:20,ordinary-classroom,本学期 COMP 课程标为 LAB，但校园课堂数据库标为 General（普通教室）；讲台电脑不等于学生工作站,https://ctl2.uwindsor.ca/classrooms/MH/311/
+Memorial Hall,311,COMP 1000,52,2325,Thursday,16:00,17:20,ordinary-classroom,本学期 COMP 课程标为 LAB，但校园课堂数据库标为 General（普通教室）；讲台电脑不等于学生工作站,https://ctl2.uwindsor.ca/classrooms/MH/311/
+Memorial Hall,311,COMP 1000,55,2328,Thursday,20:30,21:50,ordinary-classroom,本学期 COMP 课程标为 LAB，但校园课堂数据库标为 General（普通教室）；讲台电脑不等于学生工作站,https://ctl2.uwindsor.ca/classrooms/MH/311/
+Chrysler Hall North,G100,COMP 2650,53,2375,Monday,13:00,14:20,ordinary-classroom,本学期 COMP 课程标为 LAB，但校园课堂数据库标为 General（普通教室）；讲台电脑不等于学生工作站,https://ctl2.uwindsor.ca/classrooms/CHN/G100/
+Chrysler Hall North,G100,COMP 2650,54,2376,Wednesday,13:00,14:20,ordinary-classroom,本学期 COMP 课程标为 LAB，但校园课堂数据库标为 General（普通教室）；讲台电脑不等于学生工作站,https://ctl2.uwindsor.ca/classrooms/CHN/G100/
+Lambton Tower,3107,COMP 2660,51,2378,Tuesday,16:00,17:20,verified-student-workstations,计算机学院公布学生工作站机房,https://help.cs.uwindsor.ca/books/labs
+Lambton Tower,3107,COMP 2660,52,2379,Thursday,16:00,17:20,verified-student-workstations,计算机学院公布学生工作站机房,https://help.cs.uwindsor.ca/books/labs
+Dillon Hall,352,COMP 2310,54,2359,Wednesday,16:00,17:20,ordinary-classroom,本学期 COMP 课程标为 LAB，但校园课堂数据库标为 General（普通教室）；讲台电脑不等于学生工作站,https://ctl2.uwindsor.ca/classrooms/DH/352/
+Dillon Hall,354,COMP 2650,52,2374,Wednesday,11:30,12:50,ordinary-classroom,本学期 COMP 课程标为 LAB，但校园课堂数据库标为 General（普通教室）；讲台电脑不等于学生工作站,https://ctl2.uwindsor.ca/classrooms/DH/354/
+Dillon Hall,359,COMP 1000,54,2327,Thursday,19:00,20:20,ordinary-classroom,本学期 COMP 课程标为 LAB，但校园课堂数据库标为 General（普通教室）；讲台电脑不等于学生工作站,https://ctl2.uwindsor.ca/classrooms/DH/359/
+Dillon Hall,365,COMP 2650,51,2373,Monday,11:30,12:50,ordinary-classroom,本学期 COMP 课程标为 LAB，但校园课堂数据库标为 General（普通教室）；讲台电脑不等于学生工作站,https://ctl2.uwindsor.ca/classrooms/DH/365/
+Dillon Hall,368,COMP 1000,53,2326,Tuesday,19:00,20:20,ordinary-classroom,本学期 COMP 课程标为 LAB，但校园课堂数据库标为 General（普通教室）；讲台电脑不等于学生工作站,https://ctl2.uwindsor.ca/classrooms/DH/368/

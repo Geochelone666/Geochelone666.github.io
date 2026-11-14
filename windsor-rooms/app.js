@@ -30,7 +30,7 @@ const hasRegular=key=>(courseMap.get(key)||[]).some(x=>x[0]==='class');
 function statusFor(key,settings){
  const ev=byRoomDate(key,settings.date);const active=ev.filter(x=>overlaps(x,settings.from,settings.to));
  if(active.length)return {kind:'busy',label:active.some(x=>x[0]==='exam')?'考试占用':'课程占用',events:active};
- if(!hasRegular(key))return {kind:'caution',label:'未找到常规排课',events:[]};
+ if(!hasRegular(key))return {kind:'caution',label:'缺少完整排课',events:[]};
  return {kind:'good',label:'课表未占用',events:[]};
 }
 function toast(message){const el=$('toast');el.textContent=message;el.style.display='block';clearTimeout(window.__toastTimeout);window.__toastTimeout=setTimeout(()=>el.style.display='none',2800)}
@@ -53,18 +53,20 @@ function knownGaps(key,date){
 }
 function labCard(key){
  const p=current(),[building,room]=key.split('|'),m=roomMeta.get(key),s=statusFor(key,p);
- const chips=[m.capacity?m.capacity+' 台':'台数未公布',m.gpu&&!m.gpu.startsWith('未')?m.gpu.includes('A2000')?'双 NVIDIA A2000':m.gpu:'GPU 待核实',m.ram||m.cpu||'配置待核实'].slice(0,3);
+ if(['law-only','cs-majors','business-limited'].includes(m.accessLevel)&&s.kind==='good'){s.kind='caution';s.label='限制使用'}
+ if(['official-history','older-official','official-2022-23','official-family-partition'].includes(m.confidence)&&s.kind==='good'){s.kind='caution';s.label='使用待核实'}
+ const chips=[m.capacity?m.capacity+' 台':m.capacityLowerBound?'至少 '+m.capacityLowerBound+' 台':'台数未公布',m.gpu&&!m.gpu.startsWith('未')?m.gpu.includes('A2000')?'双 NVIDIA A2000':m.gpu:'GPU 待核实',m.ram||m.cpu||'配置待核实'].slice(0,3);
  const gaps=knownGaps(key,p.date).slice(0,2);const emptyHint=hasRegular(key)?('已知空档：'+(gaps.length?gaps.map(x=>x.join('–')).join(' / '):'该日没有 ≥45 分钟空档')):'未收录常规课程时间：开放情况需现场确认';
  return '<article class="lab-card '+(selected===key?'selected':'')+'" data-room="'+escapeHTML(key)+'" role="button" tabindex="0">'+
  '<div class="lab-head"><div><div class="location">'+escapeHTML(building.toUpperCase())+' · '+escapeHTML(room)+'</div><div class="lab-name">'+escapeHTML(m.name)+'</div></div><span class="pill '+s.kind+'">'+escapeHTML(s.label)+'</span></div>'+
- '<div class="lab-sub">'+escapeHTML(m.short)+' · '+escapeHTML(m.access)+'</div><div class="lab-sub"><b>'+escapeHTML(emptyHint)+'</b></div>'+
+ '<div class="lab-sub">'+escapeHTML(m.short)+' · '+escapeHTML(m.access)+'</div><div class="lab-sub"><b>'+escapeHTML(emptyHint)+'</b></div><div class="lab-sub">'+escapeHTML(m.accessLevel==='law-only'?'仅 Law 学生':m.accessLevel==='cs-majors'?'仅 CS 专业':m.accessLevel==='engineering'?'工程学院设施':m.accessLevel==='business-limited'?'商学院教学/研究':m.accessLevel==='public'?'公共电脑区':m.accessLevel==='students'?'学生学习空间':'开放条件待核实')+'</div>'+
  '<div class="spec-chips">'+chips.map(x=>'<b>'+escapeHTML(x)+'</b>').join('')+'</div></article>';
 }
 function renderResults(){
  const s=current(),valid=s.date&&s.from&&s.to&&s.from<s.to,arr=relevant(),allLabs=official.labs.map(x=>keyOf([x.building,x.room]));
  const show=allLabs.filter(k=>arr.some(a=>keyOf(a)===k));
  $('labCards').innerHTML=show.length?show.map(labCard).join(''):'<p class="muted">此筛选下没有重点计算机机房。</p>';
- $('focusCount').textContent=show.length+' 间核心机房';
+ $('focusCount').textContent=show.length+' 条设施记录（含分区与受限）';
  const stats={busy:0,good:0,caution:0};
  const markup=arr.map(x=>{
   const k=keyOf(x),m=roomMeta.get(k),st=valid?statusFor(k,s):{kind:'caution',label:'日期或时间无效'};
@@ -127,10 +129,10 @@ function renderHardware(){
  const m=roomMeta.get(selected);
  $('hardwareName').textContent=roomTitle(selected);
  $('hardwareSubtitle').textContent=m?.name||'尚未收录明确的学生工作站设备资料';
- $('sourceFlag').textContent=m?'有校方来源':'硬件待核实';
+ $('sourceFlag').textContent=m?(['official-history','older-official','official-2022-23'].includes(m.confidence)?'来源较旧 · 待核实':m.confidence==='official-family-partition'?'分区配置待核实':'有校方来源'):'硬件待核实';
  $('officialSpecs').innerHTML=[
   detailItem('类型',m?.short||'机房类型待确认'),
-  detailItem('设备数量',m?.capacity?String(m.capacity)+' 台':'未公布'),
+  detailItem('设备数量',m?.capacity?String(m.capacity)+' 台':m?.capacityLowerBound?'至少 '+m.capacityLowerBound+' 台':'未公布'),
   detailItem('电脑型号',m?.vendor?m.vendor+' · '+m.model:m?.model||'未公布'),
   detailItem('CPU',m?.cpu||'未公布'),
   detailItem('GPU',m?.gpu||'未公布'),

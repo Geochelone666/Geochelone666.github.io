@@ -15,16 +15,16 @@
  <div class="nav-note"><div style="font-size:10px;letter-spacing:.1em">DATA COVERAGE</div><strong>2026 · Fall</strong><div>课程排课与期末考试快照已合并；重点关注 Lambton Tower、Erie Hall。</div><div style="margin-top:11px;color:#8fc6c1">● 离线可查 · 不需要再次登录</div></div>
 </aside>
 <main class="workspace">
- <div class="topline"><span class="eyebrow">CAMPUS / CLASSROOM FINDER</span><span class="version">v3.0 · offline snapshot</span></div>
+ <div class="topline"><span class="eyebrow">CAMPUS / CLASSROOM FINDER</span><span class="version">v3.1 · campus-wide inventory</span></div>
  <div class="hero"><div><div class="eyebrow" style="color:#237a76">MAKE TIME FOR WHAT MATTERS</div><h1>看看哪间电脑机房可能空着。</h1><p class="subtext">先看 Lambton Tower 和 Erie Hall 的机房，再按日期、教室与星期查课。把课程、任课教师、硬件配置和待核实信息放在同一个页面。</p></div><div class="hero-symbol">⌘</div></div>
  <div class="metrics">
   <div class="metric"><strong id="mCourses">—</strong><small>全校课程</small></div>
   <div class="metric"><strong id="mRooms">—</strong><small>已知教室 / 考场</small></div>
-  <div class="metric"><strong id="mLabs">—</strong><small>学校列出的 CS 机房</small></div>
+  <div class="metric"><strong id="mLabs">—</strong><small>已收录电脑设施（含受限）</small></div>
   <div class="metric"><strong id="mEvents">—</strong><small>每周排课时段</small></div>
  </div>
  <section class="panel" id="focus">
-  <div class="heading"><div><h2>核心电脑机房</h2><p class="subtext" id="focusCaption">优先展示 GPU 机房、X Lab 和 Java Lab</p></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="meta" id="focusCount"></span><button class="btn secondary tiny" id="jumpFilters">更改查询时间</button></div></div>
+  <div class="heading"><div><h2>电脑机房与计算设施</h2><p class="subtext" id="focusCaption">优先展示 GPU 机房、X Lab 和 Java Lab</p></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="meta" id="focusCount"></span><button class="btn secondary tiny" id="jumpFilters">更改查询时间</button></div></div>
   <div class="lab-grid" id="labCards"></div>
  </section>
  <section class="panel" id="filters">
@@ -38,7 +38,7 @@
   </div>
   <div class="toolbar">
    <div class="segments" role="group" aria-label="房间范围">
-    <button class="segment active" id="filterLabs">重点电脑机房</button>
+    <button class="segment active" id="filterLabs">全部电脑设施</button>
     <button class="segment" id="filterFocus">Erie + Lambton</button>
     <button class="segment" id="filterAll">全校教室</button>
    </div>
@@ -83,7 +83,7 @@
    <div class="info-note">换设备或清理浏览器数据前请导出 JSON 备份。后续现场核实可以覆盖你自己的记录，不会改变学校来源的原始设备信息。</div>
   </section>
  </div>
- <footer>教学时间、教室与考试：UWinsite Student / 官方 Fall 2026 Exam Schedule；设备：School of Computer Science Labs / CTL Classroom Database。仅为课程排课快照，不提供实时门禁或空闲保证。<br>本网站是公开可访问的排课快照；个人现场设备笔记只保存在你的浏览器，不上传服务器。</footer>
+ <footer><a href="./labs.csv" download>下载电脑设施清单 CSV</a> · <a href="./data.json.gz" download>下载课程排程压缩数据</a><br>教学时间、教室与考试：UWinsite Student / 官方 Fall 2026 Exam Schedule；设备：School of Computer Science Labs / CTL Classroom Database。仅为课程排课快照，不提供实时门禁或空闲保证。<br>本网站是公开可访问的排课快照；个人现场设备笔记只保存在你的浏览器，不上传服务器。</footer>
 </main></div>
 <div id="toast" role="status"></div>
 <div id="loadStatus" style="position:fixed;left:24px;bottom:18px;padding:12px 16px;background:#fff;border:1px solid #ccdde8;border-radius:9px;box-shadow:0 5px 20px #2034491b;z-index:20">正在加载课程数据…</div>

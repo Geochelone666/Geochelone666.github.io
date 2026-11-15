@@ -10,13 +10,14 @@
  <button class="nav-link active" data-scroll="focus"><span class="mark">▦</span>COMP LAB 地点</button>
  <button class="nav-link" data-scroll="weekly"><span class="mark">▤</span>每周课表</button>
  <button class="nav-link" data-scroll="inventory"><span class="mark">▣</span>设备资料</button>
+ <button class="nav-link" data-scroll="smartSearch"><span class="mark">⌁</span>智能找机房</button>
  <button class="nav-link" data-scroll="all"><span class="mark">⌕</span>全校教室</button>
  </nav>
  <div class="nav-note"><div style="font-size:10px;letter-spacing:.1em">DATA COVERAGE</div><strong>2026 · Fall</strong><div>课程排课与期末考试快照已合并；重点关注 Lambton Tower、Erie Hall。</div><div style="margin-top:11px;color:#8fc6c1">● 离线可查 · 不需要再次登录</div></div>
 </aside>
 <main class="workspace">
- <div class="topline"><span class="eyebrow">CAMPUS / CLASSROOM FINDER</span><span class="version">v4.0 · COMP LAB inventory</span></div>
- <div class="hero"><div><div class="eyebrow" style="color:#237a76">MAKE TIME FOR WHAT MATTERS</div><h1>Fall 2026 的 COMP LAB 排课直接揭示了 12 个教学地点；4 间 CS 通用学生机房只是其中一部分，且 LAB 教室不一定有学生电脑。</h1><p class="subtext">先看 Lambton Tower 和 Erie Hall 的机房，再按日期、教室与星期查课。把课程、任课教师、硬件配置和待核实信息放在同一个页面。</p></div><div class="hero-symbol">⌘</div></div>
+ <div class="topline"><span class="eyebrow">CAMPUS / CLASSROOM FINDER</span><span class="version">v5.0 · smart classroom finder</span></div>
+ <div class="hero"><div><div class="eyebrow" style="color:#237a76">MAKE TIME FOR WHAT MATTERS</div><h1><span id="termHero">Fall 2026</span>：COMP Lab 的真实上课地点与工作站情况。</h1><p class="subtext">先看 Lambton Tower 和 Erie Hall 的机房，再按日期、教室与星期查课。把课程、任课教师、硬件配置和待核实信息放在同一个页面。</p></div><div class="hero-symbol">⌘</div></div>
  <div class="metrics">
   <div class="metric"><strong id="mCourses">—</strong><small>COMP 课程</small></div>
   <div class="metric"><strong id="mRooms">—</strong><small>COMP LAB 教学地点</small></div>
@@ -28,7 +29,7 @@
   <div class="lab-grid" id="labCards"></div>
  </section>
  <section class="panel" id="filters">
-  <div class="heading"><div><h2>查询教室空档</h2><p class="subtext">不必逐门搜索课程，直接按时间查教学楼</p></div><div class="title-side"><i class="small-dot"></i>Fall 2026</div></div>
+  <div class="heading"><div><h2>查询教室空档</h2><p class="subtext">不必逐门搜索课程，直接按时间查教学楼</p></div><div class="title-side"><i class="small-dot"></i><span id="termLabel">Fall 2026</span></div></div>
   <div class="filters">
    <div class="field"><label for="date">查询日期</label><input id="date" type="date" value="2026-11-13" min="2026-09-01" max="2026-12-22"/></div>
    <div class="field"><label for="from">开始时间</label><input id="from" type="time" value="13:00"/></div>
@@ -48,6 +49,18 @@
   </div>
   <div class="notice"><b>特别注意：</b>UWinsite 的 LAB 是教学形式，不代表房间配备学生工作站。Dillon、Memorial、Chrysler 等房间在学校课堂数据库中属于普通教室，可能只有讲台电脑。<br><b>空档 ≠ 可使用许可：</b>这里只判断已知课程及考试是否占用。没有记录不代表教室已开放，尤其是 walk-in 机房、研究实验室和临时预约场地。设备资料可能发生变更，现场实际为准。</div>
  </section>
+ <section class="panel" id="smartSearch">
+  <div class="heading"><div><h2>智能寻找候选机房</h2><p class="subtext">基于上面设置的日期、开始和结束时间，计算连续无已知排课的时段，优先推荐官方确认有学生工作站的机房。</p></div><span class="pill caution">不是实时门禁或预约确认</span></div>
+  <div class="smart-controls">
+    <div class="field"><label for="smartScope">搜索范围</label><select id="smartScope"><option value="verified">仅已确认的 CS 工作站机房</option><option value="comp">12 个 COMP LAB 教学地点（含普通教室）</option><option value="facilities">全部已知电脑设施（含限制使用）</option><option value="all">全校已知房间（包括普通教室）</option></select></div>
+    <div class="field"><label for="smartMin">至少连续空档</label><select id="smartMin"><option value="30">30 分钟</option><option value="45">45 分钟</option><option value="60" selected>60 分钟</option><option value="90">90 分钟</option><option value="120">120 分钟</option><option value="180">180 分钟</option></select></div>
+    <div class="field"><label for="smartHideUncertain">显示设置</label><label class="smart-checkbox"><input type="checkbox" id="smartHideUncertain"/> 只看可评估的机房，隐藏待核实项</label></div>
+    <div class="field"><label>重新计算</label><button id="smartRefresh" class="btn secondary" type="button">更新候选结果</button></div>
+  </div>
+  <div id="smartCount" aria-live="polite" class="smart-count"></div>
+  <div id="smartResults" class="smart-grid"></div>
+  <div class="smart-compare-wrap"><div class="heading"><div><h3>机房占用时间轴对比</h3><p class="subtext">勾选最多三间房间，查看指定日期 07:00–23:00 的已知课程 / 考试占用。</p></div><span class="meta">蓝色：课程　橙色：考试</span></div><div id="smartCompare"></div></div>
+ </section>
  <section class="panel" id="all">
   <div class="heading"><div><h2>所选类别 · 教室与排课结果</h2><p class="subtext">点击任意房间查看详细周课表</p></div><span class="meta" id="allCount"></span></div>
   <div class="roomlist"><table><thead><tr><th>教室</th><th>类别</th><th>选定时段</th><th>排课 / 查看</th></tr></thead><tbody id="roomRows"></tbody></table></div>
@@ -55,7 +68,7 @@
  <div class="two-col">
   <section class="panel" id="weekly">
    <div class="heading"><div><h2>选定日期所在周 · 排课与空档</h2><p class="subtext">07:00–23:00 · 按选定日期对应的一周计算，考试周也适用</p></div><span class="meta" id="weekCaption">星期一至日</span></div>
-   <div class="section-intro"><div><div class="room-heading" id="selectedTitle">Erie Hall · 3119</div><div class="room-sub" id="selectedSub"></div></div><button class="btn secondary tiny" id="jumpSpecs">查看设备</button></div>
+   <div class="section-intro"><div><div class="room-heading" id="selectedTitle">Erie Hall · 3119</div><div class="room-sub" id="selectedSub"></div></div><div class="actions" style="margin:0"><button class="btn secondary tiny" type="button" id="exportRoomICS">导出房间课表 · ICS</button><button class="btn secondary tiny" type="button" id="jumpSpecs">查看设备</button></div></div>
    <div class="week-scroll"><div class="week" id="weeklyGrid"></div></div>
    <div class="room-day-legend"><span>▰ 课程 / 实验课</span><span style="color:#167c74">▰ 课表未占用区间</span><span style="color:#ba7c35">▰ 橙色为考试安排</span></div>
    <div class="note-title">指定日期 · 详细排程</div><div class="cards" id="dateEvents"></div>
@@ -78,14 +91,15 @@
      <div class="field wide"><label for="notes">补充说明 / 现场照片文件名</label><textarea id="notes" rows="3" placeholder="记录键盘、屏幕、插座、设备年份、开放规则等"></textarea></div>
      <div class="field wide"><label for="checked">现场核实日期</label><input id="checked" type="date"/></div>
     </div>
-    <div class="form-tools"><button type="submit" class="btn">保存这间教室</button><button type="button" class="btn secondary" id="clearNote">清除我的记录</button></div>
+    <div class="field wide"><label for="roomPhoto">现场设备照片（仅存当前浏览器，不上传服务器）</label><input id="roomPhoto" type="file" accept="image/jpeg,image/png,image/webp"/><div id="roomPhotoPreview" class="photo-preview">暂无照片</div></div>
+    <div class="form-tools"><button type="button" id="photoClear" class="btn ghost tiny">移除照片</button><button type="submit" class="btn">保存这间教室</button><button type="button" class="btn secondary" id="clearNote">清除我的记录</button></div>
    </form>
    <div class="source" id="localStatus">数据仅保存在这个浏览器的本地存储中，不上传给学校。</div>
    <div class="form-tools"><button class="btn ghost" id="exportNotes">导出设备记录 JSON</button><button class="btn ghost" id="importNotes">导入以前的记录</button><input type="file" id="importFile" accept=".json,application/json" hidden/></div>
    <div class="info-note">换设备或清理浏览器数据前请导出 JSON 备份。后续现场核实可以覆盖你自己的记录，不会改变学校来源的原始设备信息。</div>
   </section>
  </div>
- <footer><a href="./comp-labs.csv" download>下载 COMP LAB 场地与时间 CSV</a> · <a href="./labs.csv" download>下载全校电脑设施 CSV</a><br>教学时间、教室与考试：UWinsite Student / 官方 Fall 2026 Exam Schedule；设备：School of Computer Science Labs / CTL Classroom Database。仅为课程排课快照，不提供实时门禁或空闲保证。<br>此网页公开可访问；你的设备现场笔记只保存在当前浏览器，不会上传服务器。</footer>
+ <footer><a href="./comp-labs.csv" download>下载 COMP LAB 场地与时间 CSV</a> · <a href="./labs.csv" download>下载全校电脑设施 CSV</a> · <a href="./quality.json" target="_blank" rel="noopener noreferrer">数据质量报告</a><br>Winter 2027 正式全校完整课表尚未发布（截至 2026-11-15）；<a href="https://www.uwindsor.ca/registrar/541/timetable-information" target="_blank" rel="noopener noreferrer">校方最新课表页面</a>。<br>教学时间、教室与考试：UWinsite Student / 官方 Fall 2026 Exam Schedule；设备：School of Computer Science Labs / CTL Classroom Database。仅为课程排课快照，不提供实时门禁或空闲保证。<br>这是公开静态排课快照；你填写的设备型号、照片及开放情况仅保存在浏览器中，换设备时需导出 JSON。</footer>
 </main></div>
 <div id="toast" role="status"></div>
 <div id="loadStatus" style="position:fixed;bottom:24px;left:24px;background:white;padding:10px;border:1px solid #ddd;border-radius:9px;z-index:30">正在加载课程数据…</div>
@@ -99,8 +113,15 @@
    ? await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'))).text()
    : new TextDecoder().decode(bytes);
   window.WD=JSON.parse(text);
-  const s=document.createElement('script');s.src='./app.js';s.onerror=()=>{document.getElementById('loadStatus').textContent='程序载入失败，请刷新网页';};document.body.append(s);
-  document.getElementById('loadStatus').remove();
+  const s=document.createElement('script');s.src='./app.js';
+  s.onerror=()=>{document.getElementById('loadStatus').textContent='程序载入失败，请刷新网页';};
+  s.onload=()=>{
+   const smart=document.createElement('script');smart.src='./smart.js';
+   smart.onerror=()=>{document.getElementById('loadStatus').textContent='智能查询模块载入失败';};
+   smart.onload=()=>document.getElementById('loadStatus')?.remove();
+   document.body.append(smart);
+  };
+  document.body.append(s);
  } catch(e){let el=document.getElementById('loadStatus');if(el){el.textContent='数据加载失败：'+e.message;el.style.color='#b94037';}}
 })();
 </script>

@@ -1,0 +1,41 @@
+name: Windsor Rooms data and site checks
+
+on:
+  push:
+    paths:
+      - 'windsor-rooms/**'
+      - '.github/workflows/windsor-rooms-check.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Validate dataset
+        run: python3 windsor-rooms/tools/data_pipeline.py validate --data windsor-rooms/data.json.gz
+      - name: Check site Javascript syntax
+        run: |
+          node --check windsor-rooms/app.js
+          node --check windsor-rooms/smart.js
+      - name: Check required static resources and metadata
+        run: |
+          python3 - <<'PY'
+          import pathlib, gzip, json
+          p=pathlib.Path('windsor-rooms')
+          required=['index.html','styles.css','app.js','smart.js','data.json.gz','labs.csv','comp-labs.csv','quality.json']
+          assert all((p/f).is_file() for f in required), 'Missing site asset'
+          text=(p/'index.html').read_text(encoding='utf8')
+          assert all(term in text for term in ['smartSearch','filterComp','exportRoomICS','roomPhoto']), 'Missing features'
+          assert 'PS_TokenSite' not in text and 'student-PORTAL-PSJSESSIONID' not in text, 'Sensitive browser session marker'
+          doc=json.loads(gzip.decompress((p/'data.json.gz').read_bytes()))
+          qa=json.loads((p/'quality.json').read_text())
+          assert qa['classes']==doc['info']['classes']
+          assert qa['exams']==doc['info']['exams']
+          assert qa['compInstructorsMapped']==doc['info']['compInstructorsMapped']
+          print('Windsor Rooms static QA PASS')
+          PY

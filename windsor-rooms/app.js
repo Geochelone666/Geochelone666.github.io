@@ -23,7 +23,10 @@ const notes=(()=>{try{return JSON.parse(localStorage.getItem(storageName))||{}}c
 const dayByName=weekday=>DC[D.indexOf(weekday)];
 const getLocalDate=()=>{const now=new Date();const d=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Toronto',year:'numeric',month:'2-digit',day:'2-digit'}).format(now);return /^\d{4}-\d{2}-\d{2}$/.test(d)?d:'2026-11-13'};
 const initial=getLocalDate();
-$('date').value=initial>'2026-12-22'?'2026-11-13':initial<'2026-09-01'?'2026-11-13':initial;
+const termStart=WD.info.termStart||'2026-09-10',termEnd=WD.info.termEnd||'2026-12-22';
+const defaultDate=initial<termStart||initial>termEnd?termStart:initial;
+$('date').min=termStart;$('date').max=termEnd;$('date').value=defaultDate;
+$('termHero').textContent=WD.info.termName||'Fall 2026';$('termLabel').textContent=WD.info.termName||'Fall 2026';
 $('mCourses').textContent=compSummary.differentCOMPcourses;
 $('mRooms').textContent=compSummary.labSites;
 $('mLabs').textContent=priority.length;
@@ -144,6 +147,9 @@ function saveNotes(){try{localStorage.setItem(storageName,JSON.stringify(notes))
 function fillNote(){
  const d=notes[selected]||{};for(const f of fields)$(f).value=d[f]||'';
  $('localStatus').textContent=d.checked?'你的最后核实日期：'+d.checked+'。本记录只在此浏览器保存。':'尚未填写现场记录。学校公开设备信息与个人核实记录互不覆盖。';
+ const pic=/^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(d.photoData||'')?d.photoData:null;
+ $('roomPhotoPreview').innerHTML=pic?'<img alt="现场设备照片" style="max-width:100%;max-height:230px;border-radius:8px" src="'+pic+'"/>':'暂无照片';
+ $('roomPhoto').value='';
 }
 function detailItem(label,value){return '<div class="detail-cell"><small>'+escapeHTML(label)+'</small><b>'+escapeHTML(value||'暂未公布')+'</b></div>'}
 function renderHardware(){
@@ -170,17 +176,50 @@ function selectRoom(key){
  selected=key;renderResults();renderWeek();renderHardware();
 }
 for(const [id,m] of [['filterComp','comp'],['filterLabs','labs'],['filterFocus','focus'],['filterOther','other'],['filterAll','all']])$(id).onclick=()=>selectMode(m);
-$('btnReset').onclick=()=>{$('date').value=initial>'2026-12-22'?'2026-11-13':initial;$('from').value='13:00';$('to').value='15:00';$('building').value='';$('keyword').value='';selectMode('comp');renderWeek()};
+$('btnReset').onclick=()=>{$('date').value=defaultDate;$('from').value='13:00';$('to').value='15:00';$('building').value='';$('keyword').value='';selectMode('comp');renderWeek()};
 for(const k of ['date','from','to','building','keyword'])$(k).addEventListener('change',()=>{renderResults();if(k==='date')renderWeek()});
 $('keyword').addEventListener('input',()=>renderResults());
 $('labCards').addEventListener('click',e=>{const el=e.target.closest('[data-room]');if(el){selectRoom(el.dataset.room);$('weekly').scrollIntoView({behavior:'smooth',block:'start'})}});
 $('labCards').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){const el=e.target.closest('[data-room]');if(el){e.preventDefault();selectRoom(el.dataset.room)}}});
 $('roomRows').addEventListener('click',e=>{const el=e.target.closest('[data-open]');if(el){selectRoom(el.dataset.open);$('weekly').scrollIntoView({behavior:'smooth',block:'start'})}});
 document.querySelectorAll('[data-scroll]').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('.nav-link').forEach(x=>x.classList.remove('active'));btn.classList.add('active');$(btn.dataset.scroll).scrollIntoView({behavior:'smooth',block:'start'})});
+function escapeCalendar(t){return String(t||'').replaceAll('\\','\\\\').replaceAll('\n','\\n').replaceAll(',','\\,').replaceAll(';','\\;')}
+function dateForUTCCalendar(date,time){
+ const [Y,M,D]=date.split('-').map(Number),[hh,mm]=time.split(':').map(Number);
+ const dateAtNoon=new Date(Date.UTC(Y,M-1,D,12,0));
+ const part=new Intl.DateTimeFormat('en-US',{timeZone:'America/Toronto',timeZoneName:'shortOffset'}).formatToParts(dateAtNoon).find(x=>x.type==='timeZoneName')?.value||'GMT-5';
+ const match=part.match(/GMT([+-])(\d{1,2})(?::(\d{2}))?/);
+ const offset=match?(match[1]==='-'?-1:1)*(Number(match[2])*60+Number(match[3]||0)):-300;
+ const utc=new Date(Date.UTC(Y,M-1,D,hh,mm)-offset*60000);
+ return utc.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}Z$/,'Z');
+}
+function exportRoomICS(){
+ const events=courseMap.get(selected)||[],lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Windsor Rooms//'+(WD.info.termName||'Fall 2026')+'//ZH','CALSCALE:GREGORIAN','METHOD:PUBLISH','X-WR-CALNAME:'+escapeCalendar('Windsor '+roomTitle(selected))];
+ const todayStamp=new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d{3}Z$/,'Z');let count=0;
+ function pushEvent(e,dt){
+  const uid='windsor-rooms-'+String(e[12]||'exam')+'-'+dt+'-'+count+'@uwindsor.github.io';
+  const professor=(faculty.get(String(e[12]))||[]).join(' / ');
+  const name=e[9]+' '+e[10]+' '+e[11];
+  const desc=[e[13],professor?'Instructor: '+professor:'', 'Classroom schedule snapshot, not live room availability. Verify closures and changes.'].filter(Boolean).join('\n');
+  lines.push('BEGIN:VEVENT','UID:'+uid,'DTSTAMP:'+todayStamp,'DTSTART:'+dateForUTCCalendar(dt,e[7]),'DTEND:'+dateForUTCCalendar(dt,e[8]),'SUMMARY:'+escapeCalendar(name),'DESCRIPTION:'+escapeCalendar(desc),'LOCATION:'+escapeCalendar(roomTitle(selected)),'END:VEVENT');count++;
+ }
+ for(const e of events){
+  if(e[0]==='exam'){if(e[4])pushEvent(e,e[4]);continue}
+  if(e[0]!=='class'||!e[5]||!e[6])continue;
+  const d=new Date(e[5]+'T12:00:00Z'),max=new Date(e[6]+'T12:00:00Z');
+  for(let i=0;d<=max&&i<150;i++,d.setUTCDate(d.getUTCDate()+1)){
+   if(D[d.getUTCDay()]===e[3])pushEvent(e,d.toISOString().slice(0,10));
+  }
+ }
+ lines.push('END:VCALENDAR');
+ const blob=new Blob([lines.join('\r\n')+'\r\n'],{type:'text/calendar;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+ a.href=url;a.download='windsor-'+selected.replace(/[^a-zA-Z0-9]+/g,'-')+'-'+String(WD.info.termName||'Fall 2026').toLowerCase().replace(/[^a-z0-9]+/g,'')+'.ics';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000);toast('已导出 '+count+' 条课程/考试日历安排（请核实临时改课和节假日）');
+}
+$('exportRoomICS').onclick=exportRoomICS;
 $('jumpSpecs').onclick=()=>$('inventory').scrollIntoView({behavior:'smooth'});
 $('jumpFilters').onclick=()=>$('filters').scrollIntoView({behavior:'smooth',block:'start'});
 $('hardwareForm').addEventListener('submit',e=>{
- e.preventDefault();let d={};for(const f of fields)d[f]=$(f).value.trim();
+ e.preventDefault();let d={...(notes[selected]||{})};for(const f of fields)d[f]=$(f).value.trim();
  d.savedAt=new Date().toISOString();notes[selected]=d;
  if(saveNotes()){fillNote();toast('现场记录已保存到此浏览器')}
 });
@@ -190,12 +229,33 @@ $('exportNotes').onclick=()=>{
  const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='windsor-room-device-notes-'+new Date().toISOString().slice(0,10)+'.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000);toast('已生成设备记录备份');
 };
 $('importNotes').onclick=()=>$('importFile').click();
+$('roomPhoto').addEventListener('change',async e=>{
+ const file=e.target.files?.[0];if(!file)return;
+ if(file.size>12*1024*1024||!/^image\/(?:jpeg|png|webp)$/.test(file.type)){toast('请使用小于 12MB 的 JPG/PNG/WebP 照片');e.target.value='';return}
+ try{
+  const objUrl=URL.createObjectURL(file),pic=new Image();
+  try{await new Promise((resolve,reject)=>{pic.onload=resolve;pic.onerror=reject;pic.src=objUrl})}finally{URL.revokeObjectURL(objUrl)}
+  const scale=Math.min(1,1100/Math.max(pic.naturalWidth,pic.naturalHeight));
+  const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(pic.naturalWidth*scale));canvas.height=Math.max(1,Math.round(pic.naturalHeight*scale));
+  canvas.getContext('2d').drawImage(pic,0,0,canvas.width,canvas.height);
+  let photo=canvas.toDataURL('image/jpeg',.72);
+  if(photo.length>750000)photo=canvas.toDataURL('image/jpeg',.4);
+  if(photo.length>750000)throw Error('照片太大，换一张或缩小尺寸');
+  notes[selected]={...(notes[selected]||{}),photoData:photo,savedAt:new Date().toISOString()};
+  if(saveNotes()){fillNote();toast('照片已压缩并保存在此浏览器，导出 JSON 可一并备份')}else toast('本地容量不足，请导出原有记录');
+ }catch(err){toast('照片处理失败：'+err.message)}
+ e.target.value='';
+});
+$('photoClear').onclick=()=>{if(!notes[selected]?.photoData)return;delete notes[selected].photoData;if(saveNotes()){fillNote();toast('照片已移除')}};
 $('importFile').addEventListener('change',async e=>{
  const f=e.target.files[0];if(!f)return;
  try{const obj=JSON.parse(await f.text());if(obj.kind!=='windsor-rooms-inspections'||!obj.rooms||typeof obj.rooms!=='object')throw new Error('文件格式不符合本工具');
- for(const [key,n] of Object.entries(obj.rooms)){if(!rooms.some(r=>keyOf(r)===key)||!n||typeof n!=='object')continue;notes[key]={};for(const fld of fields)notes[key][fld]=String(n[fld]||'').slice(0,fld==='notes'?1200:160);notes[key].savedAt=n.savedAt||new Date().toISOString();}
+ for(const [key,n] of Object.entries(obj.rooms)){if(!rooms.some(r=>keyOf(r)===key)||!n||typeof n!=='object')continue;notes[key]={};for(const fld of fields)notes[key][fld]=String(n[fld]||'').slice(0,fld==='notes'?1200:160);notes[key].savedAt=n.savedAt||new Date().toISOString();
+  if(typeof n.photoData==='string'&&n.photoData.length<800000&&/^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(n.photoData))notes[key].photoData=n.photoData;
+ }
  if(saveNotes()){fillNote();toast('已导入备份记录')}}catch(err){toast('导入失败：'+err.message)}
  e.target.value='';
 });
+window.WindsorRoomsAPI={selectRoom,selectMode,renderWeek,renderResults};
 selectRoom(selected);
 })();

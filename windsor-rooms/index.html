@@ -47,6 +47,7 @@
    </div>
    <button class="btn secondary" id="btnReset">重置查询</button>
   </div>
+  <div class="notice" id="termValidity" role="status" aria-live="polite"><b>排课资料说明：</b>当前为 Fall 2026 的历史/当期快照，仅表示已知课程及考试占用，不代表房间实时开放。</div>
   <div class="notice"><b>特别注意：</b>UWinsite 的 LAB 是教学形式，不代表房间配备学生工作站。Dillon、Memorial、Chrysler 等房间在学校课堂数据库中属于普通教室，可能只有讲台电脑。<br><b>空档 ≠ 可使用许可：</b>这里只判断已知课程及考试是否占用。没有记录不代表教室已开放，尤其是 walk-in 机房、研究实验室和临时预约场地。设备资料可能发生变更，现场实际为准。</div>
  </section>
  <section class="panel" id="smartSearch">
@@ -118,7 +119,24 @@
   s.onload=()=>{
    const smart=document.createElement('script');smart.src='./smart.js';
    smart.onerror=()=>{document.getElementById('loadStatus').textContent='智能查询模块载入失败';};
-   smart.onload=()=>document.getElementById('loadStatus')?.remove();
+   smart.onload=()=>{
+    const label=document.getElementById('termValidity');
+    const info=window.WD?.info;
+    if(label&&info){
+     const now=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Toronto',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+     const name=info.termName||'当前学期';
+     const end=info.termEnd||'';
+     const days=Math.max(0,Math.floor((Date.now()-Date.parse(info.generatedAt))/86400000));
+     if(end&&now>end){
+      label.textContent=name+' 已结束：此网站保留该学期的排课资料供历史查询。请勿据此判断新学期的教室空闲或开放情况。';
+     }else if(days>=7){
+      label.textContent=name+'：这是 '+days+' 天前生成的课程/考试快照，可能发生临时调课。查询结果不是实时空闲或使用许可。';
+     }else{
+      label.textContent=name+'：排课及考试快照已加载。没有已知课程不代表教室开放，仍需核实门禁和临时安排。';
+     }
+    }
+    document.getElementById('loadStatus')?.remove();
+   };
    document.body.append(smart);
   };
   document.body.append(s);

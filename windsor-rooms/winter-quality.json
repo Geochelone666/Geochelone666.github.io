@@ -1,0 +1,15 @@
+{
+  "term": "Winter 2027",
+  "classes": 97,
+  "exams": 0,
+  "rooms": 51,
+  "distinctCoursesWithRoom": 43,
+  "compPhysicalSections": 74,
+  "compInstructorsMapped": 73,
+  "compLABSections": 30,
+  "compLABLocations": 9,
+  "roomsWithoutRegularClass": 19,
+  "warnings": [
+    "1 COMP physical section instructor names unavailable"
+  ]
+}

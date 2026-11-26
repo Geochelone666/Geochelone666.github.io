@@ -2,13 +2,19 @@
 
 Site: https://geochelone666.github.io/windsor-rooms/
 
+**Updated 2026-11-25:** semester picker, Winter 2027 COMP-only data, installable offline web app, expanded engineering/nursing computer facilities, schedule evidence cautions.
+
+Winter 2027: 61/61 COMP courses inspected in UWinsite, 97 dated weekly COMP physical-room meetings, 9 LAB venues, 30 LAB sections. Instructor names available for 73 of the 74 COMP physical class numbers; COMP 3300 #2428 is officially *To Be Announced*. Exam allocations and non-COMP room bookings are not in the Winter data: **never treat its apparent gaps as open rooms.**
+
+Fall 2026 includes the all-subject schedule snapshot and 806 exam bookings (not live availability).
+
 ## Coverage
 
 - 956 courses indexed, 1,824 weekly classroom/day meetings, 806 exam records with a room.
 - 64 COMP courses, 12 physical COMP LAB venues, 34 distinct LAB sections.
 - 83 out of 83 physical COMP class numbers with matched instructor names, based on authenticated UWinsite section details.
 - 4 School of Computer Science general-use workstation labs, separately from regular classrooms that host LAB classes.
-- Campus-wide 183 room/facility entries, including 17 computer facilities/subdivisions; counts do not imply public access.
+- Campus-wide 186 room/facility entries, including 21 computer facilities/subdivisions; counts do not imply public access.
 
 ## Features
 
@@ -34,7 +40,7 @@ Then inspect generated `winter2027.json` and `winter2027.json.gz` and independen
 
 ## Limitations
 
-No real-time availability, door status, access authorization, temporary bookings, full holiday exceptions, or guarantees of hardware models; the schedule snapshot was assembled November 13–15, 2026. Some courses/exams lacked precise physical rooms and were excluded from occupancy calculations, not assumed to be free.
+Winter 2027 complete course PDF was published Nov 23, 2026, but has no room column; Winter room data was retrieved from UWinsite COMP class details. No real-time availability, door status, access authorization, temporary bookings, full holiday exceptions, or guarantees of hardware models; the schedule snapshot was assembled November 13–15, 2026. Some courses/exams lacked precise physical rooms and were excluded from occupancy calculations, not assumed to be free.
 
 The mobile site works without a login. `noindex,nofollow` is requested but is not a privacy/security boundary: campus classroom data on GitHub Pages is publicly accessible. Personal notes live only in browser localStorage.
 
@@ -43,3 +49,9 @@ The mobile site works without a login. `noindex,nofollow` is requested but is no
 - https://student.uwindsor.ca/
 - https://help.cs.uwindsor.ca/books/labs
 - https://ctl2.uwindsor.ca/classrooms/
+
+## Offline / term switching
+
+The PWA registers `sw.js` scoped solely to `/windsor-rooms/`, caches public files including both term datasets on first successful online load, and can work without a network after caching. Browser storage holds personal hardware notes/photos locally; the service worker neither reads nor uploads notes. Use the *Semester* selector to switch Fall 2026 / Winter 2027. Term-specific limitations remain visible in offline mode.
+
+Smoke tests: `node tools/test-smart.cjs` (no npm install). GitHub Actions runs this test and validates compressed fall/winter data on each site change.

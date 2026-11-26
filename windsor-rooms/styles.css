@@ -57,3 +57,7 @@ footer{font-size:11px;color:#8797a4;line-height:1.8;margin:25px 0 0}
 @media(max-width:850px){.smart-controls{grid-template-columns:repeat(2,minmax(0,1fr))}.compare-row{grid-template-columns:1fr 1fr}.compare-track{grid-column:1/-1}}
 @media(max-width:480px){.smart-controls{grid-template-columns:1fr}.smart-grid{grid-template-columns:1fr;max-height:620px}.smart-compare-wrap{padding:10px}.compare-row{grid-template-columns:1fr}.compare-row>.subtext{grid-column:auto}}
 .photo-preview{margin-top:7px;border:1px dashed #c7dbe2;border-radius:8px;background:#f8fbfc;padding:12px;text-align:center;font-size:12px;color:#8297a3;min-height:55px;display:grid;place-items:center;overflow:hidden}
+/* Semester switching and explicit partial coverage */
+.term-switch{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:10px 0 18px;padding:13px 15px;border:1px solid #c8dde0;border-radius:11px;background:#edf7f6}
+.term-switch label{font-size:12px;font-weight:760;color:#275969}.term-switch select{min-width:200px;max-width:100%;min-height:38px;border:1px solid #c2d4d9;border-radius:7px;background:white;padding:6px 10px;font-size:12px;font-weight:650;color:#224456}.term-switch .meta{white-space:normal;font-size:11px}
+@media(max-width:480px){.term-switch{align-items:stretch}.term-switch select{flex:1 1 100%}}

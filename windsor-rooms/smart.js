@@ -56,18 +56,18 @@ function evaluateRoom(db,key,query){
   const csOfficial=db.compLab.summary.confirmedGeneralCSLabs.includes(key);
   const lab=db.compLab.sites.find(x=>x.building===building&&x.room===room);
   const restrictions=official?.accessLevel||'unknown';
-  const limited=['law-only','business-limited','cs-majors','staff-only'].includes(restrictions);
+  const limited=['law-only','business-limited','cs-majors','staff-only','engineering-reserved','nursing-limited'].includes(restrictions);
   const classification=csOfficial?'verified-cs':lab?.classification==='ordinary-classroom'?'ordinary-classroom':lab?.classification==='cs-teaching-lab-unverified-workstations'?'lab-unverified':official?'other-computer-facility':'other-room';
   const verified=csOfficial;
   const dependable=regular&&verified;
   const chosen=free.slice().sort((a,b)=>b.minutes-a.minutes||a.start.localeCompare(b.start))[0]||null;
   return {key,building,room,official,lab,classification,verified,regular,dependable,limited,restrictions,
     gaps:free,chosen,next:chosen?closestFollowing(today,chosen.end):null,events:today,
-    status:!chosen?'occupied-or-short':!regular?'unknown-schedule':verified?'candidate':'unverified-computer',totalSections:lab?.sectionCount||0};
+    status:!chosen?'occupied-or-short':db.info.coverage==='COMP_ONLY'?'partial-coverage':!regular?'unknown-schedule':verified?'candidate':'unverified-computer',totalSections:lab?.sectionCount||0};
 }
 function rankCandidates(db,keys,query){
   const all=keys.map(key=>evaluateRoom(db,key,query));
-  const priority={candidate:0,'unverified-computer':1,'unknown-schedule':2,'occupied-or-short':3};
+  const priority={candidate:0,'partial-coverage':1,'unverified-computer':2,'unknown-schedule':3,'occupied-or-short':4};
   return all.sort((a,b)=>priority[a.status]-priority[b.status]||
     Number(b.verified)-Number(a.verified)||
     Number(!!b.regular)-Number(!!a.regular)||
@@ -82,6 +82,7 @@ function mount(db,doc){
  const $=id=>doc.getElementById(id);
  if(!$('smartSearch'))return;
  const confirmed=db.compLab.summary.confirmedGeneralCSLabs;
+ const partial=db.info.coverage==='COMP_ONLY';
  const comp=db.compLab.sites.map(s=>s.building+'|'+s.room);
  const school=db.hardware.labs.map(s=>s.building+'|'+s.room);
  const roomKeys=new Set([...comp,...confirmed,...school, ...db.rooms.map(r=>r.join('|'))]);
@@ -104,8 +105,8 @@ function mount(db,doc){
  const makeCard=r=>{
    const name=esc(r.building+' · '+r.room);
    const cls=r.status==='candidate'?'smart-positive':r.status==='occupied-or-short'?'smart-busy':'smart-warning';
-   const title=r.status==='candidate'?'课表候选':r.status==='occupied-or-short'?'时段不足':r.status==='unknown-schedule'?'没有完整常规排课':'设备/权限待核实';
-   const gap=r.chosen?esc(r.chosen.start+'–'+r.chosen.end)+' · '+r.chosen.minutes+'分钟':'所选时段不足 '+$('smartMin').value+' 分钟';
+   const title=r.status==='candidate'?'课表候选':r.status==='partial-coverage'?'仅 COMP 排课 · 其他占用未知':r.status==='occupied-or-short'?'时段不足':r.status==='unknown-schedule'?'没有完整常规排课':'设备/权限待核实';
+   const gap=r.chosen?(partial?'COMP 未见课程：':'已知空档：')+esc(r.chosen.start+'–'+r.chosen.end)+' · '+r.chosen.minutes+'分钟':'所选时段不足 '+$('smartMin').value+' 分钟';
    const next=r.next?'下一已知安排 '+esc(r.next.time+' '+r.next.course):'当天没有更晚的已知安排';
    const info=r.classification==='ordinary-classroom'?'当前教室并无学生工作站证据':r.classification==='lab-unverified'?'COMP LAB 课程地点，工作站未核实':r.official?.access||'实际门禁与临时预约情况尚不明确';
    const caution=r.verified?'官方确认配备学生工作站 · 仍需确认门禁与临时占用':'不属于已证实的 CS 通用学生工作站机房';
@@ -128,7 +129,7 @@ function mount(db,doc){
        if(!(b>a))return '';
        return '<span class="compare-busy '+(e[0]==='exam'?'exam':'')+'" style="left:'+((a-timeStart)/timeLen*100).toFixed(3)+'%;width:'+((b-a)/timeLen*100).toFixed(3)+'%" title="'+esc(e[9]+' '+e[7]+'–'+e[8])+'"></span>';
      }).join('');
-     return '<div class="compare-row"><b>'+esc(c.building+' '+c.room)+'</b><span>'+esc(typeLabel(c))+'</span><div class="compare-track">'+bars+'</div><span class="subtext">'+(c.regular?'灰色仅表示无已知排课':'此房间缺少常规课程数据')+'</span></div>';
+     return '<div class="compare-row"><b>'+esc(c.building+' '+c.room)+'</b><span>'+esc(typeLabel(c))+'</span><div class="compare-track">'+bars+'</div><span class="subtext">'+(partial?'仅标出已知 COMP 课，其他课程和考试未知':c.regular?'灰色仅表示无已知排课':'此房间缺少常规课程数据')+'</span></div>';
    }).join('');
    target.innerHTML='<div class="compare-times"><span>07:00</span><span>11:00</span><span>15:00</span><span>19:00</span><span>23:00</span></div>'+markup+'<div class="smart-actions"><button class="btn ghost tiny" type="button" id="clearSmartCompare">清除对比</button><button class="btn secondary tiny" type="button" id="exportSmartCSV">下载当日占用 CSV</button></div>';
    $('clearSmartCompare').onclick=()=>{compare.clear();renderSmart();};
@@ -155,9 +156,9 @@ function mount(db,doc){
    const selected=calculated.filter(c=>c.status==='candidate');
    const uncertain=calculated.filter(c=>c.status==='unverified-computer'||c.status==='unknown-schedule');
    const short=calculated.filter(c=>c.status==='occupied-or-short');
-   $('smartCount').textContent=selected.length+' 间有已知连续空档的 CS 工作站机房 · '+uncertain.length+' 间资料或硬件待核实 · '+short.length+' 间时段不足';
+   $('smartCount').textContent=partial?'仅 COMP 部分课表：'+calculated.length+' 个地点。其他课程及考试未纳入，全部“空档”都不能当作真实空闲。':selected.length+' 间有已知连续空档的 CS 工作站机房 · '+uncertain.length+' 间资料或硬件待核实 · '+short.length+' 间时段不足';
    const only=$('smartHideUncertain').checked;
-   const filtered=only?calculated.filter(c=>c.status==='candidate'||c.status==='occupied-or-short'):calculated;
+   const filtered=only?calculated.filter(c=>c.status==='candidate'||c.status==='occupied-or-short'||(c.status==='partial-coverage'&&c.verified)):calculated;
    $('smartResults').innerHTML=filtered.length?filtered.map(makeCard).join(''):'<div class="subtext">当前条件下没有可显示的候选教室。调整时间或开启待核实地点。</div>';
    renderCompare();
  }

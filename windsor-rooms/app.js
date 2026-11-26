@@ -2,6 +2,7 @@
 const $=id=>document.getElementById(id),D=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],DC=['周日','周一','周二','周三','周四','周五','周六'];
 const escapeHTML=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const official=WD.hardware,examRecords=WD.events,rooms=WD.rooms;
+const compOnly=WD.info?.coverage==='COMP_ONLY';
 const weekdays=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 const roomMeta=new Map([...official.labs,...official.rooms].map(r=>[r.building+'|'+r.room,r]));
 const compSites=WD.compLab.sites,compSummary=WD.compLab.summary;
@@ -31,6 +32,11 @@ $('mCourses').textContent=compSummary.differentCOMPcourses;
 $('mRooms').textContent=compSummary.labSites;
 $('mLabs').textContent=priority.length;
 $('mEvents').textContent=compSummary.uniqueLABSections;
+$('schoolLabCount').textContent=String(official.labs.length);
+if(compOnly){
+ $('filterAll').textContent='已知教学地点 / 机房';
+ $('focusCaption').textContent='Winter 2027：目前仅包含 UWinsite 核验的 COMP 课程；其他学院占用和考试均不在本数据集内。';
+}
 const faculty=new Map(Object.entries(WD.faculty||{}));
 const courseMap=new Map();for(const r of examRecords){
  const k=r[1]+'|'+r[2];if(!courseMap.has(k))courseMap.set(k,[]);courseMap.get(k).push(r);
@@ -46,6 +52,7 @@ const hasRegular=key=>(courseMap.get(key)||[]).some(x=>x[0]==='class');
 function statusFor(key,settings){
  const ev=byRoomDate(key,settings.date);const active=ev.filter(x=>overlaps(x,settings.from,settings.to));
  if(active.length)return {kind:'busy',label:active.some(x=>x[0]==='exam')?'考试占用':'课程占用',events:active};
+ if(compOnly)return {kind:'caution',label:'仅 COMP 排课 · 其余占用未知',events:[]};
  if(!hasRegular(key))return {kind:'caution',label:'缺少完整排课',events:[]};
  return {kind:'good',label:'课表未占用',events:[]};
 }
@@ -79,7 +86,9 @@ function labCard(key){
  if(['law-only','cs-majors','business-limited'].includes(m.accessLevel)&&s.kind==='good'){s.kind='caution';s.label='限制使用'}
  if(['official-history','older-official','official-2022-23','official-family-partition'].includes(m.confidence)&&s.kind==='good'){s.kind='caution';s.label='使用待核实'}
  const chips=comp?[(comp.sectionCount+' 个 LAB Section'),comp.courses.join(' / '),comp.classification==='verified-student-workstations'?'CS 学生工作站机房':comp.classification==='cs-teaching-lab-unverified-workstations'?'校方称 Lab · 电脑需核实':'普通教室 · 非已证实学生电脑机房']:[m.capacity?m.capacity+' 台':m.capacityLowerBound?'至少 '+m.capacityLowerBound+' 台':'台数未公布',m.gpu&&!m.gpu.startsWith('未')?m.gpu.includes('A2000')?'双 NVIDIA A2000':m.gpu:'GPU 待核实',m.ram||m.cpu||'配置待核实'].slice(0,3);
- const gaps=knownGaps(key,p.date).slice(0,2);const emptyHint=hasRegular(key)?('已知空档：'+(gaps.length?gaps.map(x=>x.join('–')).join(' / '):'该日没有 ≥45 分钟空档')):'未收录常规课程时间：开放情况需现场确认';
+ const gaps=knownGaps(key,p.date).slice(0,2);
+ const emptyHint=compOnly?(hasRegular(key)?'已知 COMP 课程间隙：'+(gaps.length?gaps.map(x=>x.join('–')).join(' / '):'该日没有 ≥45 分钟 COMP 间隙')+'；不包含其他课程':'未查到 COMP 占用；其他课程/考试未知'):
+ hasRegular(key)?('已知空档：'+(gaps.length?gaps.map(x=>x.join('–')).join(' / '):'该日没有 ≥45 分钟空档')):'未收录常规课程时间：开放情况需现场确认';
  return '<article class="lab-card '+(selected===key?'selected':'')+'" data-room="'+escapeHTML(key)+'" role="button" tabindex="0">'+
  '<div class="lab-head"><div><div class="location">'+escapeHTML(building.toUpperCase())+' · '+escapeHTML(room)+'</div><div class="lab-name">'+escapeHTML(m.name)+'</div></div><span class="pill '+s.kind+'">'+escapeHTML(s.label)+'</span></div>'+
  '<div class="lab-sub">'+escapeHTML(m.short)+' · '+escapeHTML(m.access)+'</div><div class="lab-sub"><b>'+escapeHTML(emptyHint)+'</b></div><div class="lab-sub">'+escapeHTML(m.accessLevel==='law-only'?'仅 Law 学生':m.accessLevel==='cs-majors'?'仅 CS 专业':m.accessLevel==='engineering'?'工程学院设施':m.accessLevel==='business-limited'?'商学院教学/研究':m.accessLevel==='public'?'公共电脑区':m.accessLevel==='students'?'学生学习空间':'开放条件待核实')+'</div>'+
@@ -90,7 +99,7 @@ function renderResults(){
  const choice=mode==='comp'?compSites.map(c=>c.building+'|'+c.room):mode==='labs'?priority:mode==='other'?allLabs:mode==='focus'?[...new Set([...compSites.filter(c=>['Erie Hall','Lambton Tower'].includes(c.building)).map(c=>c.building+'|'+c.room),...priority.filter(x=>x.startsWith('Erie Hall|')||x.startsWith('Lambton Tower|'))])]:allLabs;
  const show=choice.filter(k=>arr.some(a=>keyOf(a)===k));
  $('labCards').innerHTML=show.length?show.map(labCard).join(''):'<p class="muted">此筛选下没有对应场地。</p>';
- $('focusCount').textContent=mode==='comp'?show.length+' 个本学期 LAB 场地 · 全部34个Section':mode==='labs'?show.length+' 间官方 CS 通用机房':show.length+' 条设施/场地记录';
+ $('focusCount').textContent=mode==='comp'?show.length+' 个本学期 LAB 场地 · '+compSummary.uniqueLABSections+' 个 Section':mode==='labs'?show.length+' 间官方 CS 通用机房':show.length+' 条设施/场地记录';
  const stats={busy:0,good:0,caution:0};
  const markup=arr.map(x=>{
   const k=keyOf(x),m=roomMeta.get(k),st=valid?displayStatus(k,statusFor(k,s)):{kind:'caution',label:'日期或时间无效'};
@@ -99,7 +108,7 @@ function renderResults(){
   return '<tr><td><button class="link-room" data-open="'+escapeHTML(k)+'">'+escapeHTML(x[0]+' '+x[1])+'</button></td><td>'+escapeHTML(m?.short||(x[0]==='Erie Hall'||x[0]==='Lambton Tower'?'教室 / 设备待核实':'普通教室或专用实验室'))+'</td><td><span class="pill '+st.kind+'">'+escapeHTML(st.label)+'</span></td><td><span class="dim">'+escapeHTML(recordLabel)+'</span>　<button class="btn tiny secondary" data-open="'+escapeHTML(k)+'">查看</button></td></tr>';
  }).join('');
  $('roomRows').innerHTML=markup||'<tr><td colspan="4">此范围没有找到匹配的房间。</td></tr>';
- $('allCount').textContent=arr.length+' 个场地 · '+stats.good+' 个已知课表无占用';
+ $('allCount').textContent=arr.length+' 个场地 · '+(compOnly?'仅 COMP，其他占用未知':stats.good+' 个已知课表无占用');
  if(!valid)toast('开始时间必须早于结束时间');
 }
 function groupEvents(events){
@@ -127,12 +136,12 @@ function weekDates(date){const d=new Date(date+'T12:00:00Z');const n=d.getUTCDay
 function renderWeek(){
  $('selectedTitle').textContent=roomTitle(selected);
  const meta=roomMeta.get(selected),r=courseMap.get(selected)||[],classes=r.filter(x=>x[0]==='class');
- $('selectedSub').textContent=(meta?.name||meta?.short||'教室排课')+' · '+[...new Set(classes.map(x=>x[12]))].length+' 个不同班级';
+ $('selectedSub').textContent=(meta?.name||meta?.short||'教室排课')+' · '+[...new Set(classes.map(x=>x[12]))].length+' 个不同班级'+(compOnly?' · 仅 COMP 课程，其它占用未知':'');
  const queryDate=$('date').value,dates=weekDates(queryDate);
  $('weeklyGrid').innerHTML=weekdays.map((d,i)=>{
   const actualDate=dates[i],slots=daySlots(selected,actualDate),isCurrent=actualDate===queryDate,occupied=slots.filter(s=>!s.free&&!s.unknown).length;
   return '<div class="day '+(isCurrent?'current':'')+'"><div class="dayname">'+escapeHTML(dayByName(d))+'<small>'+escapeHTML(actualDate.slice(5))+' · '+occupied+' 项</small></div>'+slots.map(s=>s.unknown?'<div class="slot"><div class="when">无可靠课表</div><div class="teacher">开放和实际占用需现场确认</div></div>':s.free?
-   '<div class="slot free"><div class="when">'+escapeHTML(s.start+'–'+s.end)+'</div>无已知固定课程</div>':
+   '<div class="slot free"><div class="when">'+escapeHTML(s.start+'–'+s.end)+'</div>'+(compOnly?'未见 COMP 排课（其他课程未知）':'无已知固定课程')+'</div>':
    '<div class="slot '+(s.type==='exam'?'exam':'')+'"><div class="when">'+escapeHTML(s.start+'–'+s.end)+'</div><div class="course">'+escapeHTML([...s.courses].join(' / '))+'</div><div class="teacher">'+escapeHTML([...s.names].filter(Boolean).join(' / '))+'</div><div class="teacher">教师：'+escapeHTML([...s.teachers].join(' / '))+'</div><div class="teacher">'+escapeHTML([...s.sections].join(', '))+'</div></div>'
   ).join('')+'</div>';
  }).join('');
@@ -140,7 +149,7 @@ function renderWeek(){
  const todayEvents=groupEvents(byRoomDate(selected,queryDate));
  $('dateEvents').innerHTML=todayEvents.length?todayEvents.map(g=>
   '<div class="event-card"><div class="when">'+escapeHTML(g.start+'–'+g.end)+' <span class="pill '+(g.type==='exam'?'caution':'')+'">'+(g.type==='exam'?'考试':'课程')+'</span></div><div class="description"><b>'+escapeHTML([...g.courses].join(' / '))+'</b></div><div>'+escapeHTML([...g.names].filter(Boolean).join(' / '))+'</div><div class="muted">'+(g.type==='exam'?'考试安排':escapeHTML([...g.teachers].join(' / ')))+'</div></div>'
- ).join(''):'<div class="muted">这一天没有已知课程或考试记录，实际开放情况仍需现场确认。</div>';
+ ).join(''):'<div class="muted">'+(compOnly?'当日未见 COMP 排课；其他院系课程和考试占用仍然未知。':'这一天没有已知课程或考试记录，实际开放情况仍需现场确认。')+'</div>';
 }
 const fields=['deviceCount','model','cpu','gpu','memory','os','access','notes','checked'];
 function saveNotes(){try{localStorage.setItem(storageName,JSON.stringify(notes));return true}catch{toast('本地存储不可用，请先导出备份');return false}}

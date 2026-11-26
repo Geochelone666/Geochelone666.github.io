@@ -1,0 +1,15 @@
+{
+  "name": "Windsor Rooms · 校园机房课表",
+  "short_name": "Windsor Rooms",
+  "description": "University of Windsor CS lab schedules and classroom timetable snapshots, with verified coverage limits.",
+  "id": "./",
+  "start_url": "./?source=installed",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f9fa",
+  "theme_color": "#143a4e",
+  "lang": "zh-CN",
+  "icons": [
+    {"src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any"}
+  ]
+}

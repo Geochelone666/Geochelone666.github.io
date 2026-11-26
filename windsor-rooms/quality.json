@@ -2,12 +2,12 @@
   "term": "Fall 2026",
   "classes": 1824,
   "exams": 806,
-  "rooms": 183,
+  "rooms": 186,
   "distinctCoursesWithRoom": 695,
   "compPhysicalSections": 83,
   "compInstructorsMapped": 83,
   "compLABSections": 34,
   "compLABLocations": 12,
-  "roomsWithoutRegularClass": 20,
+  "roomsWithoutRegularClass": 23,
   "warnings": []
 }

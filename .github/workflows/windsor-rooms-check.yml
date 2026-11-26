@@ -18,24 +18,38 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - name: Validate dataset
         run: python3 windsor-rooms/tools/data_pipeline.py validate --data windsor-rooms/data.json.gz
+      - name: Validate Winter COMP-only dataset
+        run: python3 windsor-rooms/tools/data_pipeline.py validate --data windsor-rooms/winter2027.json.gz
+      - name: Test deterministic schedule recommendations
+        run: node windsor-rooms/tools/test-smart.cjs
       - name: Check site Javascript syntax
         run: |
           node --check windsor-rooms/app.js
           node --check windsor-rooms/smart.js
+          node --check windsor-rooms/sw.js
       - name: Check required static resources and metadata
         run: |
           python3 - <<'PY'
           import pathlib, gzip, json
           p=pathlib.Path('windsor-rooms')
-          required=['index.html','styles.css','app.js','smart.js','data.json.gz','labs.csv','comp-labs.csv','quality.json']
+          required=['index.html','styles.css','app.js','smart.js','sw.js','manifest.webmanifest','icon.svg','data.json.gz','winter2027.json.gz','labs.csv','comp-labs.csv','winter-comp-labs.csv','quality.json','winter-quality.json']
           assert all((p/f).is_file() for f in required), 'Missing site asset'
           text=(p/'index.html').read_text(encoding='utf8')
-          assert all(term in text for term in ['smartSearch','filterComp','exportRoomICS','roomPhoto']), 'Missing features'
+          assert all(term in text for term in ['smartSearch','filterComp','exportRoomICS','roomPhoto','termPicker','winter2027.json.gz']), 'Missing features'
           assert 'PS_TokenSite' not in text and 'student-PORTAL-PSJSESSIONID' not in text, 'Sensitive browser session marker'
           doc=json.loads(gzip.decompress((p/'data.json.gz').read_bytes()))
           qa=json.loads((p/'quality.json').read_text())
           assert qa['classes']==doc['info']['classes']
           assert qa['exams']==doc['info']['exams']
           assert qa['compInstructorsMapped']==doc['info']['compInstructorsMapped']
-          print('Windsor Rooms static QA PASS')
+          winter=json.loads(gzip.decompress((p/'winter2027.json.gz').read_bytes()))
+          wqa=json.loads((p/'winter-quality.json').read_text())
+          assert winter['info']['coverage']=='COMP_ONLY'
+          assert winter['info']['verifiedDetailCOMPcourses']==winter['info']['indexedCOMPcourses']==61
+          assert winter['info']['exams']==0
+          assert wqa['compLABLocations']==9 and wqa['compLABSections']==30
+          assert wqa['compInstructorsMapped']==winter['info']['compInstructorsMapped']==73
+          assert len(doc['hardware']['labs'])==21
+          assert 'student-PORTAL-PSJSESSIONID' not in (p/'sw.js').read_text()
+          print('Windsor Rooms Fall/Winter/offline static QA PASS')
           PY

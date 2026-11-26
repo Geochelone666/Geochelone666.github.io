@@ -1,0 +1,31 @@
+﻿Building,Room,Course,LAB Section,Class Number,Weekday,Start,End,Classification,Workstation evidence
+Erie Hall,3119,COMP 2540,51,2406,Monday,16:00,17:20,verified-student-workstations,School of CS official student workstations
+Erie Hall,3119,COMP 1410,53,2393,Tuesday,16:00,17:20,verified-student-workstations,School of CS official student workstations
+Erie Hall,3119,COMP 1410,55,2395,Wednesday,14:30,15:50,verified-student-workstations,School of CS official student workstations
+Erie Hall,3119,COMP 2540,52,2407,Wednesday,16:00,17:20,verified-student-workstations,School of CS official student workstations
+Erie Hall,3119,COMP 1410,58,2533,Thursday,13:00,14:20,verified-student-workstations,School of CS official student workstations
+Erie Hall,3119,COMP 2140,51,2402,Friday,08:30,09:50,verified-student-workstations,School of CS official student workstations
+Erie Hall,3119,COMP 2140,52,2403,Friday,10:00,11:20,verified-student-workstations,School of CS official student workstations
+Erie Hall,3119,COMP 2140,53,2404,Friday,11:30,12:50,verified-student-workstations,School of CS official student workstations
+Erie Hall,3119,COMP 2140,54,2534,Friday,13:00,14:20,verified-student-workstations,School of CS official student workstations
+Erie Hall,3120,COMP 2120,51,2400,Monday,16:00,17:20,ordinary-classroom,UWinsite Winter 2027 COMP LAB section venue; student computers not yet confirmed
+Erie Hall,3120,COMP 2120,52,2401,Monday,17:30,18:50,ordinary-classroom,UWinsite Winter 2027 COMP LAB section venue; student computers not yet confirmed
+Erie Hall,3120,COMP 1410,51,2391,Tuesday,13:00,14:20,ordinary-classroom,UWinsite Winter 2027 COMP LAB section venue; student computers not yet confirmed
+Erie Hall,3120,COMP 1410,52,2392,Tuesday,14:30,15:50,ordinary-classroom,UWinsite Winter 2027 COMP LAB section venue; student computers not yet confirmed
+Erie Hall,3120,COMP 2800,51,2537,Tuesday,16:00,17:20,ordinary-classroom,UWinsite Winter 2027 COMP LAB section venue; student computers not yet confirmed
+Erie Hall,3120,COMP 2800,52,2538,Tuesday,17:30,18:50,ordinary-classroom,UWinsite Winter 2027 COMP LAB section venue; student computers not yet confirmed
+Erie Hall,3120,COMP 1410,54,2394,Wednesday,13:00,14:20,ordinary-classroom,UWinsite Winter 2027 COMP LAB section venue; student computers not yet confirmed
+Erie Hall,2127,COMP 2310,51,2558,Monday,14:30,15:50,ordinary-classroom,UWinsite Winter 2027 COMP LAB section venue; student computers not yet confirmed
+Erie Hall,2127,COMP 2310,52,2559,Monday,16:00,17:20,ordinary-classroom,UWinsite Winter 2027 COMP LAB section venue; student computers not yet confirmed
+Erie Hall,2127,COMP 2310,53,2560,Wednesday,14:30,15:50,ordinary-classroom,UWinsite Winter 2027 COMP LAB section venue; student computers not yet confirmed
+West Library,305C,COMP 1410,56,2396,Monday,10:00,11:20,verified-student-workstations,School of CS official student workstations
+West Library,305C,COMP 2560,51,2409,Wednesday,16:00,17:20,verified-student-workstations,School of CS official student workstations
+West Library,305C,COMP 2560,52,2410,Wednesday,17:30,18:50,verified-student-workstations,School of CS official student workstations
+Dillon Hall,253,COMP 2650,53,2414,Tuesday,13:00,14:20,ordinary-classroom,UWinsite Winter 2027 COMP LAB section venue; student computers not yet confirmed
+Dillon Hall,253,COMP 2650,54,2415,Thursday,13:00,14:20,ordinary-classroom,UWinsite Winter 2027 COMP LAB section venue; student computers not yet confirmed
+Dillon Hall,368,COMP 2650,51,2412,Tuesday,11:30,12:50,ordinary-classroom,本学期 COMP 课程标为 LAB，但校园课堂数据库标为 General（普通教室）；讲台电脑不等于学生工作站
+Dillon Hall,368,COMP 2650,52,2413,Thursday,11:30,12:50,ordinary-classroom,本学期 COMP 课程标为 LAB，但校园课堂数据库标为 General（普通教室）；讲台电脑不等于学生工作站
+Lambton Tower,2103,COMP 1400,51,2388,Friday,10:00,11:20,cs-teaching-lab-unverified-workstations,2025 校方工程公告称 Lab 2103；本学期 COMP 2120 在此上 LAB；学生工作站与开放权限未证实
+Lambton Tower,2103,COMP 1400,52,2389,Friday,11:30,12:50,cs-teaching-lab-unverified-workstations,2025 校方工程公告称 Lab 2103；本学期 COMP 2120 在此上 LAB；学生工作站与开放权限未证实
+Dillon Hall,350,COMP 1000,52,2384,Thursday,17:30,18:50,ordinary-classroom,UWinsite Winter 2027 COMP LAB section venue; student computers not yet confirmed
+Dillon Hall,353,COMP 1000,51,2383,Tuesday,17:30,18:50,ordinary-classroom,UWinsite Winter 2027 COMP LAB section venue; student computers not yet confirmed

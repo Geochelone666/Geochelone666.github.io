@@ -1,8 +1,8 @@
 /* Windsor Rooms offline shell: only cache assets under /windsor-rooms/.
    Never cache school login pages, third-party requests, or personal notes. */
-const CACHE_NAME='windsor-rooms-v6-20261125b';
+const CACHE_NAME='windsor-rooms-v6-20261126-exam23';
 const CACHE_PREFIX='windsor-rooms-v';
-const APP_FILES=['./','./index.html','./styles.css','./app.js','./smart.js','./data.json.gz','./winter2027.json.gz','./manifest.webmanifest','./icon.svg','./quality.json','./labs.csv','./comp-labs.csv','./winter-comp-labs.csv'];
+const APP_FILES=['./','./index.html','./styles.css','./app.js','./smart.js','./data.json.gz','./winter2027.json.gz','./manifest.webmanifest','./icon.svg','./quality.json','./exam-changes-20261123.json','./labs.csv','./comp-labs.csv','./winter-comp-labs.csv'];
 self.addEventListener('install',event=>{
  event.waitUntil(caches.open(CACHE_NAME).then(cache=>cache.addAll(APP_FILES)).then(()=>self.skipWaiting()));
 });

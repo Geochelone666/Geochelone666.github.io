@@ -1,0 +1,113 @@
+{
+  "source": "UWindsor Fall 2026 official exam schedule PDF dated 2026-11-23",
+  "source_pdf_filename": "fall_2026_exam_schedule_latest.pdf",
+  "previous_room_assignments": 806,
+  "official_room_assignments": 803,
+  "official_rows_without_room": 219,
+  "unparsed": 0,
+  "removed_old_assignments": [
+    [
+      "MGMT-2400",
+      "3",
+      "2026-12-12",
+      "15:30",
+      "18:30",
+      "Toldo Health Education Ctr",
+      "204"
+    ],
+    [
+      "MGMT-2400",
+      "4",
+      "2026-12-12",
+      "15:30",
+      "18:30",
+      "Toldo Health Education Ctr",
+      "204"
+    ],
+    [
+      "NURS-4980",
+      "1",
+      "2026-12-16",
+      "08:30",
+      "11:30",
+      "Education Building",
+      "1121"
+    ],
+    [
+      "NURS-4980",
+      "1",
+      "2026-12-16",
+      "08:30",
+      "11:30",
+      "Education Building",
+      "1123"
+    ],
+    [
+      "ELEC-8900",
+      "30",
+      "2026-12-16",
+      "08:30",
+      "11:30",
+      "Winclare Hall",
+      "110"
+    ],
+    [
+      "PHYS-3500",
+      "1",
+      "2026-12-17",
+      "08:30",
+      "11:30",
+      "Odette Building",
+      "B06"
+    ],
+    [
+      "MECH-8290",
+      "60",
+      "2026-12-19",
+      "15:30",
+      "18:30",
+      "Biology Building",
+      "113"
+    ]
+  ],
+  "added_or_reassigned": [
+    [
+      "ICDS-4010",
+      "1",
+      "2026-12-16",
+      "19:00",
+      "22:00",
+      "Dillon Hall",
+      "364"
+    ],
+    [
+      "ELEC-8900",
+      "30",
+      "2026-12-16",
+      "08:30",
+      "11:30",
+      "C.A.W. Student Centre",
+      "GYM"
+    ],
+    [
+      "MECH-8290",
+      "60",
+      "2026-12-16",
+      "08:30",
+      "11:30",
+      "C.A.W. Student Centre",
+      "GYM"
+    ],
+    [
+      "PHYS-3500",
+      "1",
+      "2026-12-17",
+      "08:30",
+      "11:30",
+      "Essex Hall",
+      "287"
+    ]
+  ],
+  "old_unknown_room_rows": 217,
+  "updated_unknown_room_rows": 219
+}

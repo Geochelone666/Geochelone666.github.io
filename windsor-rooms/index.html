@@ -102,7 +102,7 @@
    <div class="info-note">换设备或清理浏览器数据前请导出 JSON 备份。后续现场核实可以覆盖你自己的记录，不会改变学校来源的原始设备信息。</div>
   </section>
  </div>
- <footer><a href="./comp-labs.csv" download>下载 COMP LAB 场地与时间 CSV</a> · <a href="./labs.csv" download>下载全校电脑设施 CSV</a> · <a href="./winter-comp-labs.csv" download>Winter 2027 COMP LAB CSV</a> · <a href="./quality.json" target="_blank" rel="noopener noreferrer">数据质量报告</a><br>Winter 2027 校方已发布最终课程 Timetable（2026-11-23），但官方 PDF 不含具体教室房号，房间占用须以 UWinsite 逐门记录为准；<a href="https://www.uwindsor.ca/registrar/541/timetable-information" target="_blank" rel="noopener noreferrer">校方最新课表页面</a>。<br>教学时间、教室与考试：UWinsite Student / 官方 Fall 2026 Exam Schedule；设备：School of Computer Science Labs / CTL Classroom Database。仅为课程排课快照，不提供实时门禁或空闲保证。<br>这是公开静态排课快照；你填写的设备型号、照片及开放情况仅保存在浏览器中，换设备时需导出 JSON。</footer>
+ <footer><a href="./comp-labs.csv" download>下载 COMP LAB 场地与时间 CSV</a> · <a href="./labs.csv" download>下载全校电脑设施 CSV</a> · <a href="./winter-comp-labs.csv" download>Winter 2027 COMP LAB CSV</a> · <a href="./quality.json" target="_blank" rel="noopener noreferrer">数据质量报告</a> · <a href="./exam-changes-20261123.json" target="_blank" rel="noopener noreferrer">11月23日考试考场修订记录</a><br>Winter 2027 校方已发布最终课程 Timetable（2026-11-23），但官方 PDF 不含具体教室房号，房间占用须以 UWinsite 逐门记录为准；<a href="https://www.uwindsor.ca/registrar/541/timetable-information" target="_blank" rel="noopener noreferrer">校方最新课表页面</a>。<br>教学时间、教室与考试：UWinsite Student / 官方 Fall 2026 Exam Schedule；设备：School of Computer Science Labs / CTL Classroom Database。仅为课程排课快照，不提供实时门禁或空闲保证。<br>这是公开静态排课快照；你填写的设备型号、照片及开放情况仅保存在浏览器中，换设备时需导出 JSON。</footer>
 </main></div>
 <div id="toast" role="status"></div>
 <div id="loadStatus" style="position:fixed;bottom:24px;left:24px;background:white;padding:10px;border:1px solid #ddd;border-radius:9px;z-index:30">正在加载课程数据…</div>
@@ -142,13 +142,13 @@
     const label=document.getElementById('termValidity'),info=window.WD?.info;
     if(label&&info){
       const now=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Toronto',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
-      const days=Math.max(0,Math.floor((Date.now()-Date.parse(info.generatedAt))/86400000));
+      const days=Math.max(0,Math.floor((Date.now()-Date.parse(info.sourceCapturedAt||info.generatedAt))/86400000));
       const name=info.termName||'当前学期';
       label.textContent=info.coverage==='COMP_ONLY'
         ? name+' 当前仅为 COMP 专项课表：已核验 '+info.verifiedDetailCOMPcourses+'/'+info.indexedCOMPcourses+' 门课程。其他院系课程和考试占用未知；不可判断教室真正空闲。'
         : info.termEnd&&now>info.termEnd
         ? name+' 已结束：此网站保留历史排课供查询，请勿据此判断新学期教室空闲。'
-        : days>=7?name+'：本资料生成于 '+days+' 天前，可能存在调课；空档不是开放许可。'
+        : days>=7?name+'：课程排课最早采集于 '+days+' 天前'+(info.examSourceDate?'；考试安排以 '+info.examSourceDate+' 官方修订版为准':'')+'。可能存在调课；课表空档不是开放许可。'
         : name+'：课表快照已加载，未见排课也不代表有门禁使用权限。';
     }
     const updateConnection=()=>{

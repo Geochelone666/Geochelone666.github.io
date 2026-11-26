@@ -6,11 +6,11 @@ Site: https://geochelone666.github.io/windsor-rooms/
 
 Winter 2027: 61/61 COMP courses inspected in UWinsite, 97 dated weekly COMP physical-room meetings, 9 LAB venues, 30 LAB sections. Instructor names available for 73 of the 74 COMP physical class numbers; COMP 3300 #2428 is officially *To Be Announced*. Exam allocations and non-COMP room bookings are not in the Winter data: **never treat its apparent gaps as open rooms.**
 
-Fall 2026 includes the all-subject schedule snapshot and 806 exam bookings (not live availability).
+Fall 2026 includes the all-subject schedule snapshot and 803 exam bookings (not live availability).
 
 ## Coverage
 
-- 956 courses indexed, 1,824 weekly classroom/day meetings, 806 exam records with a room.
+- 956 courses indexed, 1,824 weekly classroom/day meetings, 803 exam records with a room.
 - 64 COMP courses, 12 physical COMP LAB venues, 34 distinct LAB sections.
 - 83 out of 83 physical COMP class numbers with matched instructor names, based on authenticated UWinsite section details.
 - 4 School of Computer Science general-use workstation labs, separately from regular classrooms that host LAB classes.
@@ -27,7 +27,7 @@ Fall 2026 includes the all-subject schedule snapshot and 806 exam bookings (not 
 
 ## Updating next semester
 
-`tools/data_pipeline.py` is a deterministic CSV importer and validator. It consumes the explicit `Windsor_Rooms_v3_Full_Schedule.csv` schema, validates times, term dates, class numbers, exam dates, room identity, and COMP lab coverage. Provide the new semester's verified CSV export and a base JSON metadata file. It does not scrape university sources or fabricate missing rooms; the next full-term timetable may not yet be published.
+`tools/data_pipeline.py` is a deterministic CSV importer and validator. It consumes the explicit `Windsor_Rooms_v3_Full_Schedule.csv` schema, validates times, term dates, class numbers, exam dates, room identity, and COMP lab coverage. Provide the new semester's verified CSV export and a base JSON metadata file. It does not scrape university sources or fabricate missing rooms; the official Winter 2027 timetable PDF is published, but does not contain room numbers.
 
 Example (do not overwrite production data until reviewed):
 
@@ -55,3 +55,9 @@ The mobile site works without a login. `noindex,nofollow` is requested but is no
 The PWA registers `sw.js` scoped solely to `/windsor-rooms/`, caches public files including both term datasets on first successful online load, and can work without a network after caching. Browser storage holds personal hardware notes/photos locally; the service worker neither reads nor uploads notes. Use the *Semester* selector to switch Fall 2026 / Winter 2027. Term-specific limitations remain visible in offline mode.
 
 Smoke tests: `node tools/test-smart.cjs` (no npm install). GitHub Actions runs this test and validates compressed fall/winter data on each site change.
+
+## Official Fall 2026 exam revision check (Nov 23, 2026)
+
+The official Registrar PDF revised November 23 supersedes the old Nov 13 exam snapshot: 803 room assignments vs 806 previously. Exactly 7 old rows disappeared and 4 new/reassigned rows appeared (including PHYS 3500 Odette B06 -> Essex 287, ELEC 8900 Winclare 110 -> CAW Gym, and newly listed ICDS 4010 Dillon 364). 219 additional exam rows list no assigned room. The updated data generator uses this latest official PDF; no guessed room values. The exact comparison is publicly downloadable as `exam-changes-20261123.json` and its original evidence is retained privately in the data build environment and can be reproduced with `sync_fall_exams_20261123.py` from extracted PDF text. Source: https://www.uwindsor.ca/registrar/sites/uwindsor.ca.registrar/files/fall_2026_exam_schedule.pdf
+
+The Fall course-schedule extraction was performed on 2026-11-13; subsequent builds do not reset its snapshot age. A new `sourceCapturedAt` field distinguishes data capture from static-site compilation. The official exam source date is tracked separately in `examSourceDate`.
